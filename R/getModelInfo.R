@@ -8,7 +8,7 @@ getModelInfo = function(model, psOpt, minimize) {
   # add numbers of feature(s)
   info$featureNumber = length(model[["features"]])
   # add type / class of feature(s)
-  info$featureType = getParamTypes(psOpt)
+  info$featureType = ParamHelpers::getParamTypes(psOpt)
   # add the name of the problem (name of the dataset)
   info$dataName = model[["task.desc"]][["id"]]
   # add the learners name
@@ -19,6 +19,6 @@ getModelInfo = function(model, psOpt, minimize) {
   # add minimize as TRUE or FALSE
   info$minimize = minimize
   # add the levels of the discretes variables
-  info$discreteLevel = getValues(psOpt)
+  info$discreteLevel = ParamHelpers::getValues(psOpt)
   return(info)
 }

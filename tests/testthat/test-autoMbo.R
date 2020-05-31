@@ -25,5 +25,5 @@ test_that("Test if works for mixed ps + every argument in use + maximize", {
   expect_equal(length(plot$data), 3)
   expect_equal(class(plot$data$class), "factor")
   expect_equal(class(plot$data$iteration), c("ordered", "factor"))
-  expect_equal(length(plot$data$iteration), 88) # mbo's * repls * (iters + 1) --> 3 * 2 * (10 + 1) = 66
+  expect_equal(length(plot$data$iteration), 88)
 })

@@ -1,4 +1,23 @@
+#' Benchmark and plot \code{mlrMBO::mbo()} optimization runs to investigate hyperparameters
+#'
+#' This functions benchmarks the \code{mlrMBO::mbo()} function on different configurations and
+#' then plots them wrt the hyperparameters.
+#'
 #' @export
+#'
+#' @import mlrMBO
+#' @import mlr
+#' @import ParamHelpers
+#' @import lhs
+#' @import batchtools
+#' @import ggplot2
+#' @import dplyr
+#' @import tidyr
+#' @importFrom data.table data.table
+#' @importFrom data.table CJ
+#' @import cmaesr
+#' @import irace
+#' @import smoof
 
 autoMbo = function(data, target, minimize = FALSE, funcEvals = 45,
                    minFuncEvals = 10, itersMboTune = 10, repls = 10,
@@ -35,7 +54,7 @@ autoMbo = function(data, target, minimize = FALSE, funcEvals = 45,
 
   psOpt = EBO::generateParamSpace(data, target)
 
-  surrogateModel = mlr::train(mlr::makeLearner("regr.randomForest", nodesize = 1),
+  surrogateModel = mlr::train(mlr::makeLearner("regr.randomForest", nodesize = 3),
                               mlr::makeRegrTask(data = data, target = target))
 
   info = EBO::getModelInfo(surrogateModel, psOpt, minimize)
@@ -45,7 +64,7 @@ autoMbo = function(data, target, minimize = FALSE, funcEvals = 45,
   resTuneDmbo = EBO::tuneDmboMbo(surrogateModel, minFuncEvals, funcEvals, psTune, itersMboTune,
                                  minimize, repls, ncpus, seed, psOpt, info, steps)
 
-  repls = repls*3
+  repls = repls*2
 
   # benchmarkMbo default
   paramsSmboDefault = data.table::data.table(design = list("maximinLHS"),

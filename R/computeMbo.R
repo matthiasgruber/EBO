@@ -1,6 +1,6 @@
 computeMBO = function(reg, objNormal, configMbo, info, repls = 1) {
-  addAlgorithm(name = "mlrMBO", fun = configMboFunc, reg = reg)
-  addExperiments(prob.designs = objNormal, algo.designs = configMbo, repls = repls, reg = reg)
+  batchtools::addAlgorithm(name = "mlrMBO", fun = configMboFunc, reg = reg)
+  batchtools::addExperiments(prob.designs = objNormal, algo.designs = configMbo, repls = repls, reg = reg)
 }
 
 configMboFunc = function(instance, funcEvals = 50, design = NULL, amountDesign = NULL,
@@ -25,21 +25,21 @@ configMboFunc = function(instance, funcEvals = 50, design = NULL, amountDesign =
 
 
   if (is.null(design)) {
-    design = generateDesign(n = amountDesign, par.set = getParamSet(instance[[1]]), fun = lhs::maximinLHS)
+    design = ParamHelpers::generateDesign(n = amountDesign, par.set = ParamHelpers::getParamSet(instance[[1]]), fun = lhs::maximinLHS)
   }
 
   if (is.character(design) & !(design == "random")) {
-    design = generateDesign(n = amountDesign, par.set = getParamSet(instance[[1]]), fun = get(design))
+    design = ParamHelpers::generateDesign(n = amountDesign, par.set = ParamHelpers::getParamSet(instance[[1]]), fun = get(design))
   }
 
   if (is.character(design) & (design == "random"))  {
-     design = generateRandomDesign(n = amountDesign, par.set = getParamSet(instance[[1]]), trafo = FALSE)
+     design = ParamHelpers::generateRandomDesign(n = amountDesign, par.set = ParamHelpers::getParamSet(instance[[1]]), trafo = FALSE)
   }
 
 
   if (is.numeric(design)) {
     amountSample = instance[[2]]$featureNumber*1500
-    designQ = generateRandomDesign(n = amountSample, par.set = getParamSet(instance[[1]]), trafo = FALSE)
+    designQ = ParamHelpers::generateRandomDesign(n = amountSample, par.set = ParamHelpers::getParamSet(instance[[1]]), trafo = FALSE)
 
     y = as.data.frame(instance[[1]](designQ))
     colnames(y) = instance[[2]]$y.name
@@ -60,7 +60,7 @@ configMboFunc = function(instance, funcEvals = 50, design = NULL, amountDesign =
 
   control$store.model.at = 1
 
-  optimizationPath = mbo(fun = instance[[1]], design = design, learner = surrogate, control = control, show.info = TRUE)
+  optimizationPath = mlrMBO::mbo(fun = instance[[1]], design = design, learner = surrogate, control = control, show.info = TRUE)
 
   y = as.data.frame(optimizationPath[["y"]])
   colnames(y) = instance[[2]]$y.name

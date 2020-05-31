@@ -1,5 +1,5 @@
 reduceMbo = function(ids = NULL) {
-  mlrMBOresult = reduceResultsList(ids, fun = reduceOptimize)
+  mlrMBOresult = batchtools::reduceResultsList(ids, fun = reduceOptimize)
   for (i in 1:length(mlrMBOresult)) {
     names(mlrMBOresult[[i]]) = c("recommendedParameters","optimizationPathMBO")
   }
@@ -13,7 +13,7 @@ reduceOptimize = function(result) {
 
 
 reduceRacing = function(ids = NULL, repls){
-  racingResult = reduceResultsList(ids, fun = reduceOptimize)
+  racingResult = batchtools::reduceResultsList(ids, fun = reduceOptimize)
   for (i in 1:length(racingResult)) {
     names(racingResult[[i]]) = "recommendedParameters"
   }
@@ -21,7 +21,7 @@ reduceRacing = function(ids = NULL, repls){
 }
 
 reduceEs = function(ids = NULL, repls){
-  esResult = reduceResultsList(ids, fun = reduceOptimize)
+  esResult = batchtools::reduceResultsList(ids, fun = reduceOptimize)
   for (i in 1:length(esResult)) {
     names(esResult[[i]]) = "recommendedParameters"
   }
@@ -30,7 +30,7 @@ reduceEs = function(ids = NULL, repls){
 
 
 reduceRandom = function(ids = NULL, repls) {
-  randomResult = reduceResultsList(ids, fun = reduceOptimize)
+  randomResult = batchtools::reduceResultsList(ids, fun = reduceOptimize)
   for (i in 1:length(randomResult)) {
     names(randomResult[[i]]) = c("recommendedParametersRandom","optimizationPathRandom")
     for (ii in 1:2) {

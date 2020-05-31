@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotBenchmark.R
 \name{plotBenchmark}
 \alias{plotBenchmark}
-\title{benchmark and plot}
+\title{Benchmark and plot all optimizers which are implemented in EBO.}
 \usage{
 plotBenchmark(
   instance,

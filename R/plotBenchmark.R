@@ -1,4 +1,4 @@
-#' benchmark and plot
+#' Benchmark and plot all optimizers which are implemented in EBO.
 #'
 #'
 #' This functions benchmarks the
@@ -22,13 +22,13 @@ plotBenchmark = function(instance, psOpt, funcEvals = 65, paramsMBO = data.table
                          minimize = TRUE, repls = 25,
                          showInfo = TRUE, ncpus = NA, seed = 1) {
   startTime <- Sys.time()
-  info = getModelInfo(instance, psOpt, minimize)
+  info = EBO::getModelInfo(instance, psOpt, minimize)
   # create registry
   reg = batchtools::makeExperimentRegistry(file.dir = NA, seed = seed)
 
-  objEncoded = createObjDesignEncoded(list(instance), psOpt, info)
-  objEncodedSpot = createObjDesignEncodedSpot(list(instance), psOpt, info)
-  objNormal = createObjDesignNormal(list(instance), psOpt, info)
+  objEncoded = EBO::createObjDesignEncoded(list(instance), psOpt, info)
+  objEncodedSpot = EBO::createObjDesignEncodedSpot(list(instance), psOpt, info)
+  objNormal = EBO::createObjDesignNormal(list(instance), psOpt, info)
 
   # add the encoded objective function to the registry
   batchtools::addProblem(name = "objEncoded", fun = objEncodedFunc, reg = reg)
@@ -37,34 +37,29 @@ plotBenchmark = function(instance, psOpt, funcEvals = 65, paramsMBO = data.table
   # add the normal objective function to the registry
   batchtools::addProblem(name = "objNormal", fun = objNormalFunc, reg = reg)
 
-  configCmaesr = createConfigCmaesr(funcEvals, paramsCMAESR)
-  configMbo = createConfigMbo(funcEvals, paramsMBO)
-  configRandom = createConfigRandom(funcEvals)
-  configRacing = createConfigRacing(funcEvals)
-  configEs = createConfigEs(funcEvals, paramsES)
-  configDe = createConfigDe(funcEvals, paramsDE)
-  configGe = createConfigGe(funcEvals, paramsGE)
+  configCmaesr = EBO::createConfigCmaesr(funcEvals, paramsCMAESR)
+  configMbo = EBO::createConfigMbo(funcEvals, paramsMBO)
+  configRandom = EBO::createConfigRandom(funcEvals)
+  configRacing = EBO::createConfigRacing(funcEvals)
+  configEs = EBO::createConfigEs(funcEvals, paramsES)
+  configDe = EBO::createConfigDe(funcEvals, paramsDE)
+  configGe = EBO::createConfigGe(funcEvals, paramsGE)
 
+  EBO::computeRandom(reg, objNormal, configRandom, repls)
+  EBO::computeMBO(reg, objNormal, configMbo, info, repls)
+  if (funcEvals >= 50) EBO::computeRacing(reg, objNormal, configRacing, repls)
+  if (funcEvals >= 50) EBO::computeCMAESR(reg, objEncoded, configCmaesr, repls)
+  if (funcEvals >= 50) EBO::computeEs(reg, objEncodedSpot, configEs, repls)
+  if (funcEvals >= 50) EBO::computeDE(reg, objEncodedSpot, configDe, repls)
+  if (funcEvals >= 50) EBO::computeGe(reg, objEncodedSpot, configGe, repls)
 
+  EBO::executeComputation(reg, ncpus)
 
-  computeRandom(reg, objNormal, configRandom, repls)
-  computeMBO(reg, objNormal, configMbo, info, repls)
-  if (funcEvals >= 50) computeRacing(reg, objNormal, configRacing, repls)
-  if (funcEvals >= 50) computeCMAESR(reg, objEncoded, configCmaesr, repls)
-  if (funcEvals >= 50) computeEs(reg, objEncodedSpot, configEs, repls)
-  if (funcEvals >= 50) computeDE(reg, objEncodedSpot, configDe, repls)
-  if (funcEvals >= 50) computeGe(reg, objEncodedSpot, configGe, repls)
+  resultsRandom = EBO::reduceRandom(ids = seq(from = 1, to = repls))
 
+  resultsMbo = EBO::reduceMbo(ids = seq(from = (repls + 1), to = (repls*2)))
 
-  executeComputation(reg, ncpus)
-
-
-
-  resultsRandom = reduceRandom(ids = seq(from = 1, to = repls))
-
-  resultsMbo = reduceMbo(ids = seq(from = (repls + 1), to = (repls*2)))
-
-  if (funcEvals >= 50) resultsRacing = reduceRacing(ids = seq(from = ((repls*2)+1),
+  if (funcEvals >= 50) resultsRacing = EBO::reduceRacing(ids = seq(from = ((repls*2)+1),
                                                               to = (repls*3)))
 
   if (funcEvals >= 50) resultCmeasr = batchtools::reduceResultsList(ids = seq(from = (repls*3)+1,
@@ -150,12 +145,12 @@ plotBenchmark = function(instance, psOpt, funcEvals = 65, paramsMBO = data.table
   endTime <- Sys.time()
   timeTaken <- round(endTime - startTime,2)
 
-  plot = ggplot(resultsPlotable, aes(factor(method), y)) +
+  plot = ggplot2::ggplot(resultsPlotable, aes(factor(method), y)) +
     geom_boxplot() +
     ylab(info$y.name)
 
   if (showInfo == TRUE) {
-    plot = addInfo(plot, info, timeTaken, repls)
+    plot = EBO::addInfo(plot, info, timeTaken, repls)
   }
 
   return(plot)

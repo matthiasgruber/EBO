@@ -23,11 +23,11 @@ test_that("Test if works for mixed ps + every argument in use + maximize", {
 
   plotBenchmark2 = plotBenchmark(instance, psOpt, funcEvals, minimize = FALSE, repls = 2, seed = 1)
 
-  expect_equal(class(plotBenchmark), c("gg", "ggplot"))
-  expect_equal(length(plotBenchmark), 9)
-  expect_equal(length(plotBenchmark$data), 2)
-  expect_equal(class(plotBenchmark$data$method), "character")
-  expect_equal(class(plotBenchmark$data$y), "numeric")
-  expect_equal(length(plotBenchmark$data$y), 15) # numberOptimizers * repls --> 5 * 3 = 15
+  expect_equal(class(plotBenchmark2), c("gg", "ggplot"))
+  expect_equal(length(plotBenchmark2), 9)
+  expect_equal(length(plotBenchmark2$data), 2)
+  expect_equal(class(plotBenchmark2$data$method), "character")
+  expect_equal(class(plotBenchmark2$data$y), "numeric")
+  expect_equal(length(plotBenchmark2$data$y), 14) # numberOptimizers * repls --> 7 * 2 = 14
 }
 )

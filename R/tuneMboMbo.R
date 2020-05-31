@@ -1,36 +1,41 @@
+#' Benchmark and plot \code{mlrMBO::mbo()} optimization runs to investigate hyperparameters
+#'
+#' This functions benchmarks the \code{mlrMBO::mbo()} function on different configurations and
+#' then plots them wrt the hyperparameters.
 #' @export
+#'
 tuneMboMbo = function(instance, psOpt, funcEvals, psTune, itersMboTune = 10,
                       minimize = FALSE, repls = 15, ncpus = NA, seed = 1,
                       designOpt = NULL, maxTime = NULL) {
 
   set.seed(seed)
-  info = getModelInfo(instance[[1]], psOpt, minimize)
+  info = EBO::getModelInfo(instance[[1]], psOpt, minimize)
 
   getMedianBenchmarkMbo = function(x) {
 
-    listControlLearner = createMboControlSurrogate(x)
+    listControlLearner = EBO::createMboControlSurrogate(x)
 
     if (is.null(designOpt)) designOpt = x$design
 
-    paramsMBO = data.table(design = designOpt, ## list
+    paramsMBO = data.table::data.table(design = designOpt, ## list
                            amountDesign = x$amountDesign, ##list
                            control = list(listControlLearner[[1]]),
                            surrogate = list(listControlLearner[[2]])
     )
 
-    resMboBenchmark = benchmarkMbo(instance, psOpt, funcEvals, paramsMBO, minimize, repls, ncpus, seed)
+    resMboBenchmark = EBO::benchmarkMbo(instance, psOpt, funcEvals, paramsMBO, minimize, repls, ncpus, seed)
 
     results = NA
     for (i in 1:length(resMboBenchmark)) {
       results[i] = resMboBenchmark[[i]][["recommendedParameters"]][info$featureNumber+1]
     }
-    if (length(resMboBenchmark) != repls) warning()
+    #if (length(resMboBenchmark) != repls) warning() # add warning if a config failed
 
     median = median(unlist(results))
     return(median)
   }
 
-  mboMboFuncMulti = makeSingleObjectiveFunction(
+  mboMboFuncMulti = smoof::makeSingleObjectiveFunction(
     name = "tuneMboMbo",
     fn = getMedianBenchmarkMbo,
     par.set = psTune,
@@ -38,14 +43,14 @@ tuneMboMbo = function(instance, psOpt, funcEvals, psTune, itersMboTune = 10,
     minimize = minimize
   )
 
-  controlTune = makeMBOControl(n.objectives = 1L, y.name = "y")
-  controlTune = setMBOControlInfill(controlTune, crit = makeMBOInfillCritEI())
-  if (!is.null(itersMboTune)) controlTune = setMBOControlTermination(controlTune, iters = itersMboTune)
-  if (!is.null(maxTime)) controlTune = setMBOControlTermination(controlTune, time.budget = maxTime)
+  controlTune = mlrMBO::makeMBOControl(n.objectives = 1L, y.name = "y")
+  controlTune = mlrMBO::setMBOControlInfill(controlTune, crit = mlrMBO::makeMBOInfillCritEI())
+  if (!is.null(itersMboTune)) controlTune = mlrMBO::setMBOControlTermination(controlTune, iters = itersMboTune)
+  if (!is.null(maxTime)) controlTune = mlrMBO::setMBOControlTermination(controlTune, time.budget = maxTime)
 
-  design = generateDesign(n = 12, par.set = psTune, fun = lhs::maximinLHS)
+  design = ParamHelpers::generateDesign(n = 12, par.set = psTune, fun = lhs::maximinLHS)
 
-  resMboTune = mbo(mboMboFuncMulti, design = design, control = controlTune, show.info = TRUE)
+  resMboTune = mlrMBO::mbo(mboMboFuncMulti, design = design, control = controlTune, show.info = TRUE)
 
   hyperparamsPath = as.data.frame(resMboTune[["opt.path"]][["env"]][["path"]])
 

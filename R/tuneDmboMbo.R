@@ -18,12 +18,12 @@ tuneDmboMbo = function(surrogateModel, minFuncEvals, funcEvals, psTune, itersMbo
 
   if (step == 1) minFuncEvals = minFuncEvals + info$featureNumber + 1
 
-  stepOne = benchmarkMbo(list(surrogateModel), psOpt, minFuncEvals, paramsMBO = data.table::data.table(NULL),
+  stepOne = EBO::benchmarkMbo(list(surrogateModel), psOpt, minFuncEvals, paramsMBO = data.table::data.table(NULL),
                          minimize = minimize, repls = 1, ncpus = ncpus, seed = seed, delReg = TRUE)
 
   design = as.data.frame(stepOne[[1]][["optimizationPathMBO"]][["opt.path"]][["env"]][["path"]])
 
-  surrogateModelTune = list(mlr::train(mlr::makeLearner("regr.randomForest", nodesize = 1),
+  surrogateModelTune = list(mlr::train(mlr::makeLearner("regr.randomForest", nodesize = 3),
                                        mlr::makeRegrTask(data = design, target = info$y.name)))
 
   bestHyperparams = data.frame()
@@ -38,7 +38,7 @@ tuneDmboMbo = function(surrogateModel, minFuncEvals, funcEvals, psTune, itersMbo
 
     if(step > 2) designOpt = list(resTuneDmbo[[step-2]][[2]])
 
-    bestHyperparams = tuneMboMbo(surrogateModelTune, psOpt, minFuncEvals, psTune, itersMboTune = itersMboTune,
+    bestHyperparams = EBO::tuneMboMbo(surrogateModelTune, psOpt, minFuncEvals, psTune, itersMboTune = itersMboTune,
                                  minimize = minimize, repls = repls, ncpus = ncpus, seed = seed,
                                  designOpt = designOpt, maxTime = NULL)
 
@@ -54,7 +54,7 @@ tuneDmboMbo = function(surrogateModel, minFuncEvals, funcEvals, psTune, itersMbo
                                        surrogate = list(listControlLearner[[2]])
     )
 
-    resComputeDmbo = benchmarkMbo(list(surrogateModel), psOpt, minFuncEvals, paramsMBO = paramsMBO,
+    resComputeDmbo = EBO::benchmarkMbo(list(surrogateModel), psOpt, minFuncEvals, paramsMBO = paramsMBO,
                                   minimize = minimize, repls = 1, ncpus = ncpus, seed = seed, delReg = TRUE)
 
     evals = nrow(resComputeDmbo[[1]][["optimizationPathMBO"]][["opt.path"]][["env"]][["path"]])

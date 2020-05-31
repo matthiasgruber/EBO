@@ -102,23 +102,23 @@ plotAutoMbo = function(resMboDefault, resDmboTuned, minFuncEvals, funcEvals, rep
   }
 
   boxplotCurve = ggplot2::ggplot(resultsPlotable, aes(x = iteration, y = resultsPlotable..j.., fill = class)) +
-    theme(legend.position = "bottom", legend.direction = "vertical") +
-    stat_summary(fun = median, geom ="line", aes(group = class, color = class)) +
+    ggplot2::theme(legend.position = "bottom", legend.direction = "vertical") +
+    ggplot2::stat_summary(fun = median, geom ="line", aes(group = class, color = class)) +
     #geom_boxplot(alpha = 0.3, outlier.shape = NA) +
-    ylab(info$y.name) +
-    geom_vline(xintercept = markSteps, color = "red")
+    ggplot2::ylab(info$y.name) +
+    ggplot2::geom_vline(xintercept = markSteps, color = "red")
 
   if (funcEvals > 50) {
     howMany = floor(length(iterationCharacter)/20)
     breaksVec = iterationCharacter[seq(1, length(iterationCharacter), howMany)]
-    boxplotCurve = boxplotCurve + scale_x_discrete(breaks = breaksVec)
+    boxplotCurve = boxplotCurve + ggplot2::scale_x_discrete(breaks = breaksVec)
   }
 
   endTime <- Sys.time()
   timeTaken <- round(endTime - startTime,2)
 
   if (showInfo == TRUE) {
-    boxplotCurve = addInfo(boxplotCurve, info, timeTaken, repls)
+    boxplotCurve = EBO::addInfo(boxplotCurve, info, timeTaken, repls)
   }
 
   return(boxplotCurve)
