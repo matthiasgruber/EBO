@@ -96,38 +96,38 @@
 #'
 #' }
 generateConfigdata = function(task, funcEvals = NULL, paramsMBO = NULL,
-                             namesBoxplot = c("default"), instanceList,
-                             repls = 5, showInfo = TRUE, ncpus = NA, seed = 1) {
+                              namesBoxplot = c("default"),
+                              repls = 12, showInfo = TRUE, ncpus = NA, seed = 1) {
   startTime <- Sys.time()
   set.seed(seed)
 
-  numberInstances = length(instanceList)
+  #numberInstances = length(instanceList)
 
-  configDataFrame = vector(mode = "list", length = numberInstances)
+  #configDataFrame = vector(mode = "list", length = numberInstances)
 
-  model = vector(mode = "list", length = numberInstances)
+  #model = vector(mode = "list", length = numberInstances)
 
-  for(r in 1:numberInstances) {
+  #for(r in 1:numberInstances) {
 
   # i = 2
   #  funcEvals = 7
   #  seed=1
   #  repls=2
   #  ncpus= NA
-  model[[r]] = mlr::train(mlr::makeLearner(task$simulation), mlr::makeRegrTask(data = instanceList[[r]], target = task$target))
+  model = mlr::train(mlr::makeLearner(task$simulation), mlr::makeRegrTask(data = task$data, target = task$target))
 
-  info = getModelInfo(model[[r]], task$psOpt, minimize = task$minimize)
+  info = getModelInfo(model, task$psOpt, minimize = task$minimize)
 
-  resMBO = benchmarkMbo(list(model[[r]]), task$psOpt, funcEvals, paramsMBO, minimize = task$minimize,
+  resMBO = benchmarkMbo(list(model), task$psOpt, funcEvals, paramsMBO, minimize = task$minimize,
                         repls, ncpus, seed, delReg = TRUE)
 
-#####################
+  #####################
   optimizationPath = as.list(NA)
   results = as.list(NA)
   targetColumn = info$featureNumber+1
   numberBoxplotCurve = length(namesBoxplot)
 
- # i=1
+  # i=1
   for (i in 1:(repls*numberBoxplotCurve)) {
     optimizationPath[[i]] = as.data.frame(resMBO[[i]][["optimizationPathMBO"]]$opt.path)
     # compute the best y found so far. iteration 0 = initial data
@@ -203,10 +203,10 @@ generateConfigdata = function(task, funcEvals = NULL, paramsMBO = NULL,
   y.name = info$y.name
   colnames(resultsPlotable)[colnames(resultsPlotable) == 'X1'] = y.name
 
-  configDataFrame[[r]] = resultsPlotable
-  }
+  #configDataFrame[[r]] = resultsPlotable
 
-  configDataFrame = bind_rows(configDataFrame)
 
-  return(configDataFrame)
+  #configDataFrame = bind_rows(configDataFrame)
+
+  return(resultsPlotable)
 }
