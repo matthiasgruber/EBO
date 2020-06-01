@@ -35,24 +35,14 @@ testAddIters = function(configResults, baseIters = 20, addIters = 10, minimize =
   }
 
 
-  # create test for each config
-  #steps = repls*2
-
-  #end_first = steps
-  #end_last = repls*2*numberBoxplotCurve
-  #end_index = seq(from = end_first, to = end_last, by = steps)
-
-  #start_first = 1
-  #start_last = end_last-steps+1
-  #start_index = seq(from = start_first, to = start_last, by = steps)
-
-  min_max = ifelse(minimize == FALSE, "l", "g")
+  min_max = ifelse(minimize == FALSE, "g", "l")
 
   testResults = vector(mode = "list", length = numberBoxplotCurve)
 
   for(r in 1:numberBoxplotCurve) {
-    testResults[[r]] = wilcox.test(test[[r]]$y_best ~ test[[r]]$iters, alternative = min_max, data = test[[r]], paired = TRUE)
-    #testResults[[r]] = wilcoxsign_test(test[[r]]$y_best ~ test[[r]]$iters, alternative = min_max, zero.method = c("Pratt") ,data = test[[r]], paired = TRUE)
+    #testResults[[r]] = wilcox.test(test[[r]]$y_best ~ test[[r]]$iters, alternative = min_max, data = test[[r]], paired = TRUE)
+    testResults[[r]] = coin::wilcoxsign_test(test[[r]]$y_best ~ test[[r]]$iters, alternative = min_max, zero.method = c("Pratt"),
+                                       data = test[[r]], paired = TRUE)
 
     names(testResults)[r] = namesBoxplot[r]
   }
