@@ -9,7 +9,7 @@
 #' @param psParamPlot [\code{ParamHelpers::ParamSet()}]\cr
 #'  Parameter space of the hyperparameters to investigate.
 #' @param resolution [\code{integer(1) | integer(2)}]\cr
-#'  The size of the grid for investigating the hyperparameters
+#'  The size of the grid for investigating the hyperparameter effect.
 #'
 #' @return A 1D or 2D ggplot2 object to investigate the effect of the hyperparameters.
 #'

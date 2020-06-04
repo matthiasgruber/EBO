@@ -15,6 +15,7 @@
 #'  Should information be plotted?\cr
 #'  Default is `TRUE`.
 #'
+#' @return A ggplot2 object.
 #'
 #' @export
 #'

@@ -55,6 +55,9 @@ Define the seed used for the computation. Will be set by \code{batchtools}.
 Which means the jobs get the seed plus the job.id as their unique seed. \cr
 Default is one.}
 }
+\value{
+A ggplot2 object.
+}
 \description{
 This function tunes the DMBO hyperparameters and then plots the best DMBO configuration
 against the default SMBO configuration.

@@ -22,8 +22,8 @@ Define the amount of black-box function evaluations.}
 \item{psParamPlot}{[\code{ParamHelpers::ParamSet()}]\cr
 Parameter space of the hyperparameters to investigate.}
 
-\item{resolution}{[\code{numeric(1) | numeric(2)}]\cr
-The size of the grid for investigating the hyperparameters}
+\item{resolution}{[\code{integer(1) | integer(2)}]\cr
+The size of the grid for investigating the hyperparameter effect.}
 
 \item{repls}{[\code{integer(1)}]\cr
 Define how often each configuration is replicated for the benchmark.\cr

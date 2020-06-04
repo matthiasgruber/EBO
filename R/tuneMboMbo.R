@@ -34,7 +34,7 @@
 #'  This argument will overwrite itersMboTune and set a maximum time budget in seconds
 #'  for the tuning.
 #'
-#' @return A data.frame containing the best hyperparameter set found.
+#' @return A data.frame containing the best suited hyperparameter set.
 #'
 #' @export
 #'
