@@ -24,14 +24,6 @@ benchmarkDmbo = function(instances, psOpt, funcEvals, paramsMbo, minimize = TRUE
     for (i in 1:numberInstances) {
       configMbo[[i]] = EBO::createConfigMbo(funcEvals, paramsMbo[c((replsOrg * (i-1) + 1) : (replsOrg * i)),])
     }
-
-
-    #objNormal1 = EBO::createObjDesignNormal(list(instances[[1]]), psOpt, info)
-    #objNormal2 = EBO::createObjDesignNormal(list(instances[[2]]), psOpt, info)
-    #objNormal3 = EBO::createObjDesignNormal(list(instances[[3]]), psOpt, info)
-    #configMbo1 = EBO::createConfigMbo(funcEvals, paramsMbo[c((replsOrg * 0 + 1) : (replsOrg * 1)),])
-    #configMbo2 = EBO::createConfigMbo(funcEvals, paramsMbo[c((replsOrg * 1 + 1) : (replsOrg * 2)),])
-    #configMbo3 = EBO::createConfigMbo(funcEvals, paramsMbo[c((replsOrg * 2 + 1) : (replsOrg * 3)),])
   }
   # create registry
   reg = batchtools::makeExperimentRegistry(file.dir = NA, seed = seed)
@@ -49,9 +41,6 @@ benchmarkDmbo = function(instances, psOpt, funcEvals, paramsMbo, minimize = TRUE
     for (i in 1:numberInstances) {
       batchtools::addExperiments(prob.designs = objNormal[[i]], algo.designs = configMbo[[i]], repls = repls, reg = reg)
     }
-    #batchtools::addExperiments(prob.designs = objNormal1, algo.designs = configMbo1, repls = repls, reg = reg)
-    #batchtools::addExperiments(prob.designs = objNormal2, algo.designs = configMbo2, repls = repls, reg = reg)
-    #batchtools::addExperiments(prob.designs = objNormal3, algo.designs = configMbo3, repls = repls, reg = reg)
   }
   # execute computation
   EBO::executeComputation(reg, ncpus)

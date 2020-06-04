@@ -5,7 +5,7 @@ benchmarkCmaesr = function(instance, psOpt, funcEvals = NULL, configCmaesr = dat
   info = EBO::getModelInfo(instance[[1]], psOpt, minimize)
   # generate the design of the objective function
   objEncoded = EBO::createObjDesignEncoded(instance, psOpt, info)
-  # generate the configuration (hyperparameters) of cmaesr::cmaes()
+  # generate the configuration (hyperparameters) for cmaesr::cmaes()
   configCmaesr = EBO::createConfigCmaesr(funcEvals, configCmaesr)
   # create registry for the computation
   reg = batchtools::makeExperimentRegistry(file.dir = NA, seed = seed)

@@ -3,11 +3,66 @@
 #' This functions benchmarks the \code{mlrMBO::mbo()} function on different configurations and
 #' then plots them wrt the hyperparameters.
 #'
+#' @inheritParams tuneMboMbo
+#' @inheritParams autoMbo
 #'
-#' @return A ggplot2 object to investigate hyperparameters.
+#' @param psParamPlot [\code{ParamHelpers::ParamSet()}]\cr
+#'  Parameter space of the hyperparameters to investigate.
+#' @param resolution [\code{integer(1) | integer(2)}]\cr
+#'  The size of the grid for investigating the hyperparameters
+#'
+#' @return A 1D or 2D ggplot2 object to investigate the effect of the hyperparameters.
 #'
 #' @export
 #'
+#' @examples
+#' \dontrun{
+#' set.seed(1)
+#' data <- data.frame(a = runif(50,10,5555), b = runif(50,-30000,-500),
+#'                    c = runif(50,0,1000),
+#'                    d = sample(c("nitrogen","air","argon"), 50, replace = TRUE))
+#' data$ratio <- rowSums(data[,1:3]^2)
+#' data$ratio <- data$ratio/max(data$ratio)
+#' colnames(data) <- c("power", "time", "pressure", "gas","ratio")
+#' psOpt = ParamHelpers::makeParamSet(
+#'   ParamHelpers::makeIntegerParam("power", lower = 10, upper = 5555),
+#'   ParamHelpers::makeIntegerParam("time", lower = -30000, upper = -500),
+#'   ParamHelpers::makeNumericParam("pressure", lower = 0, upper = 1000),
+#'   ParamHelpers::makeDiscreteParam("gas", values = c("nitrogen", "air", "argon"))
+#' )
+#'
+#' task = task(
+#'   simulation = "regr.randomForest",
+#'   data = data,
+#'   target = "ratio",
+#'   psOpt = psOpt,
+#'   minimize = FALSE
+#' )
+#'
+#' funcEvals = 10
+#'
+#' psParamPlot = ParamHelpers::makeParamSet(
+#'   ParamHelpers::makeDiscreteParam("surrogate", values = ("regr.randomForest")),
+#'   ParamHelpers::makeDiscreteParam("crit", values = ("makeMBOInfillCritAdaCB")),
+#'   ParamHelpers::makeIntegerParam("cb.lambda.start", lower = 5, upper = 15,
+#'                                  requires = quote(crit == "makeMBOInfillCritAdaCB")),
+#'   ParamHelpers::makeNumericParam("cb.lambda.end", lower = 1, upper = 5,
+#'                                  requires = quote(crit == "makeMBOInfillCritAdaCB"))
+#' )
+#'
+#' resolution = 2
+#'
+#' repls = 2
+#'
+#' showInfo = TRUE
+#'
+#' ncpus = NA
+#'
+#' seed = 1
+#'
+#' contourPlot = plotMboHyperparams(task, funcEvals, psParamPlot, resolution,
+#'                                  repls, showInfo, ncpus, seed)
+#' }
 
 
 
@@ -16,8 +71,6 @@ plotMboHyperparams = function(task, funcEvals, psParamPlot, resolution, repls, s
   set.seed(seed)
 
   startTime <- Sys.time()
-
-  instancesTest = list()
 
   instancesTest = mlr::train(mlr::makeLearner(task$simulation),
                              mlr::makeRegrTask(data = task$data, target = task$target))

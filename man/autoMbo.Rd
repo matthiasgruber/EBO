@@ -2,13 +2,13 @@
 % Please edit documentation in R/autoMbo.R
 \name{autoMbo}
 \alias{autoMbo}
-\title{Benchmark and plot \code{mlrMBO::mbo()} optimization runs to investigate hyperparameters}
+\title{Tune DMBO and plot vs SMBO default}
 \usage{
 autoMbo(
   data,
   target,
   minimize = FALSE,
-  funcEvals = 45,
+  funcEvals,
   minFuncEvals = 10,
   itersMboTune = 10,
   repls = 10,
@@ -17,7 +17,67 @@ autoMbo(
   seed = 1
 )
 }
+\arguments{
+\item{data}{[\code{data.frame(1)}]\cr
+A data.frame containing the data for the blac-box function simulation.}
+
+\item{target}{[\code{character}]\cr
+A character string containing the name of the target variable.}
+
+\item{minimize}{[\code{logical(1)}]\cr
+Should the target be minimized? \cr
+Default is `FALSE`.}
+
+\item{funcEvals}{[\code{integer(1)}]\cr
+Define the amount of black-box function evaluations.}
+
+\item{minFuncEvals}{[\code{integer(1)}]\cr
+An integer which defines when to switch between the hyperparameters.}
+
+\item{itersMboTune}{[\code{integer(1)}]\cr
+Define the amount of black-box function evaluations.\cr
+Default is ten.}
+
+\item{repls}{[\code{integer(1)}]\cr
+Define how often each configuration is replicated for the benchmark.\cr
+Default is ten.}
+
+\item{showInfo}{[\code{logical(1)}]\cr
+Should information be plotted?\cr
+Default is `TRUE`.}
+
+\item{ncpus}{[\code{numeric(1)}]\cr
+Define how many cpu cores are used for the benchmark.\cr
+Default is NA, which uses all cores minus one.}
+
+\item{seed}{[\code{numeric(1)}]\cr
+Define the seed used for the computation. Will be set by \code{batchtools}.
+Which means the jobs get the seed plus the job.id as their unique seed. \cr
+Default is one.}
+}
 \description{
-This functions benchmarks the \code{mlrMBO::mbo()} function on different configurations and
-then plots them wrt the hyperparameters.
+This function tunes the DMBO hyperparameters and then plots the best DMBO configuration
+against the default SMBO configuration.
+}
+\examples{
+\dontrun{
+set.seed(1)
+data <- data.frame(a=runif(50,10,5555),b=runif(50,-30000,-500))
+data$ratio <- rowSums(data)
+data$ratio <- data$ratio/max(data$ratio)
+colnames(data) <- c("a","t","y")
+
+target = c("y")
+
+minimize = FALSE
+funcEvals = 13
+minFuncEvals = 5
+itersMboTune = 1
+
+repls = 2
+
+plot = EBO::autoMbo(data, target, minimize, funcEvals, minFuncEvals, itersMboTune, repls)
+}
+
+
 }

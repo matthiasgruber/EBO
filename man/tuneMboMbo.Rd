@@ -2,7 +2,7 @@
 % Please edit documentation in R/tuneMboMbo.R
 \name{tuneMboMbo}
 \alias{tuneMboMbo}
-\title{Benchmark and plot \code{mlrMBO::mbo()} optimization runs to investigate hyperparameters}
+\title{Tune SMBO hyperparameters.}
 \usage{
 tuneMboMbo(
   instance,
@@ -11,14 +11,103 @@ tuneMboMbo(
   psTune,
   itersMboTune = 10,
   minimize = FALSE,
-  repls = 15,
+  repls = 10,
   ncpus = NA,
   seed = 1,
   designOpt = NULL,
   maxTime = NULL
 )
 }
+\arguments{
+\item{instance}{[\code{wrapped model}]\cr
+A trained mlr model.}
+
+\item{psOpt}{[\code{ParamHelpers::ParamSet()}]\cr
+Parameter space for the optimization.}
+
+\item{funcEvals}{[\code{integer(1)}]\cr
+Define the amount of black-box function evaluations.}
+
+\item{psTune}{[\code{ParamHelpers::ParamSet()}]\cr
+The parameter space for the tuning.}
+
+\item{itersMboTune}{[\code{integer(1)}]\cr
+Define the amount of black-box function evaluations.\cr
+Default is ten.}
+
+\item{minimize}{[\code{logical(1)}]\cr
+Should the target be minimized? \cr
+Default is `FALSE`.}
+
+\item{repls}{[\code{integer(1)}]\cr
+Define how often each configuration is replicated for the benchmark.\cr
+Default is ten.}
+
+\item{ncpus}{[\code{numeric(1)}]\cr
+Define how many cpu cores are used for the benchmark.\cr
+Default is NA, which uses all cores minus one.}
+
+\item{seed}{[\code{numeric(1)}]\cr
+Define the seed used for the computation. Will be set by \code{batchtools}.
+Which means the jobs get the seed plus the job.id as their unique seed. \cr
+Default is one.}
+
+\item{designOpt}{[\code{data.frame(1)}]\cr
+A data.frame containing the initial design for the optimization.}
+
+\item{maxTime}{[\code{integer(1)}]\cr
+This argument will overwrite itersMboTune and set a maximum time budget in seconds
+for the tuning.}
+}
+\value{
+A data.frame containing the best hyperparameter set found.
+}
 \description{
-This functions benchmarks the \code{mlrMBO::mbo()} function on different configurations and
-then plots them wrt the hyperparameters.
+This function tunes the SMBO hyperparameters. The user can
+choose if the tuning is initialized with an initial design or not.
+}
+\examples{
+\dontrun{
+set.seed(1)
+data <- data.frame(a=runif(50,10,100),b=runif(50,40,750),d=runif(50,0,90))
+data$ratio <- rowSums(data^2)
+data$ratio <- data$ratio/max(data$ratio)
+colnames(data) <- c("power","time","pressure","ratio")
+
+model = list(mlr::train(mlr::makeLearner("regr.randomForest"),
+             mlr::makeRegrTask(data = data, target = "ratio")))
+
+psOpt = ParamHelpers::makeParamSet(
+  ParamHelpers::makeNumericParam("power", lower = 10, upper = 100),
+  ParamHelpers::makeNumericParam("time", lower = 40, upper = 750),
+  ParamHelpers::makeNumericParam("pressure", lower = 0, upper = 90)
+)
+
+funcEvals = 10
+
+psTune = ParamHelpers::makeParamSet(
+  ParamHelpers::makeDiscreteParam("design", values = c("maximinLHS",
+                                                       "optimumLHS")),
+
+  ParamHelpers::makeDiscreteParam("crit", values = c("makeMBOInfillCritEI",
+                                                     "makeMBOInfillCritAEI",
+                                                     "makeMBOInfillCritCB",
+                                                     "makeMBOInfillCritAdaCB")),
+
+  ParamHelpers::makeDiscreteParam("surrogate", values = c("regr.randomForest",
+                                                          "regr.km")),
+
+  ParamHelpers::makeDiscreteParam("covtype" ,values = c("gauss","matern5_2",
+                                                        "matern3_2","powexp"),
+                                  requires = quote(surrogate == "regr.km"))
+)
+
+itersMboTune = 2
+
+minimize = FALSE
+
+repls = 2
+
+resTune = tuneMboMbo(model, psOpt, funcEvals, psTune, itersMboTune, minimize, repls)
+}
 }

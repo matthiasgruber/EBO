@@ -1,10 +1,10 @@
 #' Benchmark and plot all optimizers which are implemented in EBO.
 #'
 #'
-#' This functions benchmarks the
-#' then plots them as boxplots wrt to their iterations.
+#' This functions benchmarks the optimization algorithms and
+#' then plots them as boxplots.
 #'
-#'
+#' @inheritParams tuneMboMbo
 #'
 #' @return A plot containing one boxplot curve for each configurations benchmarked.
 #'
@@ -16,27 +16,37 @@
 #' @example
 #' \dontrun{
 #' }
-plotBenchmark = function(instance, psOpt, funcEvals = 65, paramsMBO = data.table::data.table(NULL),
+plotBenchmark = function(task, funcEvals = 65, paramsMBO = data.table::data.table(NULL),
                          paramsCMAESR = data.table::data.table(NULL), paramsES = data.table::data.table(NULL),
                          paramsDE = data.table::data.table(NULL), paramsGE = data.table::data.table(NULL),
-                         minimize = TRUE, repls = 25,
-                         showInfo = TRUE, ncpus = NA, seed = 1) {
+                         repls = 25, showInfo = TRUE, ncpus = NA, seed = 5) {
+
   startTime <- Sys.time()
-  info = EBO::getModelInfo(instance, psOpt, minimize)
+  set.seed(1)
+
+  # create surrogate of the black-box function
+  instance = mlr::train(mlr::makeLearner(task$simulation),
+                        mlr::makeRegrTask(data = task$data, target = task$target))
+
+  # get information of the optimization problem
+  info = EBO::getModelInfo(instance, task$psOpt, task$minimize)
+
   # create registry
   reg = batchtools::makeExperimentRegistry(file.dir = NA, seed = seed)
 
-  objEncoded = EBO::createObjDesignEncoded(list(instance), psOpt, info)
-  objEncodedSpot = EBO::createObjDesignEncodedSpot(list(instance), psOpt, info)
-  objNormal = EBO::createObjDesignNormal(list(instance), psOpt, info)
+  # create designs for objective function
+  objEncoded = EBO::createObjDesignEncoded(list(instance), task$psOpt, info)
+  objEncodedSpot = EBO::createObjDesignEncodedSpot(list(instance), task$psOpt, info)
+  objNormal = EBO::createObjDesignNormal(list(instance), task$psOpt, info)
 
-  # add the encoded objective function to the registry
+  # add the numeric encoded objective function to the registry
   batchtools::addProblem(name = "objEncoded", fun = objEncodedFunc, reg = reg)
-  # add the encoded objective function to the registry
+  # add the numeric and integer encoded objective function to the registry
   batchtools::addProblem(name = "objEncodedSpot", fun = objSPOTFunc, reg = reg)
   # add the normal objective function to the registry
   batchtools::addProblem(name = "objNormal", fun = objNormalFunc, reg = reg)
 
+  # create configurations for optimization algos
   configCmaesr = EBO::createConfigCmaesr(funcEvals, paramsCMAESR)
   configMbo = EBO::createConfigMbo(funcEvals, paramsMBO)
   configRandom = EBO::createConfigRandom(funcEvals)
@@ -45,6 +55,7 @@ plotBenchmark = function(instance, psOpt, funcEvals = 65, paramsMBO = data.table
   configDe = EBO::createConfigDe(funcEvals, paramsDE)
   configGe = EBO::createConfigGe(funcEvals, paramsGE)
 
+  # add optimization algos to registry
   EBO::computeRandom(reg, objNormal, configRandom, repls)
   EBO::computeMBO(reg, objNormal, configMbo, info, repls)
   if (funcEvals >= 50) EBO::computeRacing(reg, objNormal, configRacing, repls)
@@ -53,31 +64,25 @@ plotBenchmark = function(instance, psOpt, funcEvals = 65, paramsMBO = data.table
   if (funcEvals >= 50) EBO::computeDE(reg, objEncodedSpot, configDe, repls)
   if (funcEvals >= 50) EBO::computeGe(reg, objEncodedSpot, configGe, repls)
 
+  # execute computation
   EBO::executeComputation(reg, ncpus)
 
+  # reduce results
   resultsRandom = EBO::reduceRandom(ids = seq(from = 1, to = repls))
-
   resultsMbo = EBO::reduceMbo(ids = seq(from = (repls + 1), to = (repls*2)))
-
   if (funcEvals >= 50) resultsRacing = EBO::reduceRacing(ids = seq(from = ((repls*2)+1),
-                                                              to = (repls*3)))
-
+                                                                   to = (repls*3)))
   if (funcEvals >= 50) resultCmeasr = batchtools::reduceResultsList(ids = seq(from = (repls*3)+1,
                                                                               to = (repls*4)), fun = reduceOptimize)
-
   if (funcEvals >= 50) resultEs = batchtools::reduceResultsList(ids = seq(from = (repls*4)+1,
-                                                                              to = (repls*5)), fun = reduceOptimize)
-
+                                                                          to = (repls*5)), fun = reduceOptimize)
   if (funcEvals >= 50) resultDe = batchtools::reduceResultsList(ids = seq(from = (repls*5)+1,
                                                                           to = (repls*6)), fun = reduceOptimize)
-
   if (funcEvals >= 50) resultGe = batchtools::reduceResultsList(ids = seq(from = (repls*6)+1,
                                                                           to = (repls*7)), fun = reduceOptimize)
-
-
+  # remove registry
   batchtools::removeRegistry(0, reg)
-
-
+  # transform results for plot
   resultCmeasrPlotable = as.data.frame(NA)
   if (funcEvals >= 50) {
     for (i in 1:repls) {
@@ -137,18 +142,18 @@ plotBenchmark = function(instance, psOpt, funcEvals = 65, paramsMBO = data.table
     resultGePlotable[,2] = "spotGE"
     colnames(resultGePlotable) = c("y","method")
   }
-
+  # combine results into one data frame
   resultsPlotable = as.data.frame(rbind(resultCmeasrPlotable,resultRandomPlotable,resultMboPlotable,
                                         resultRacingPlotable,resultEsPlotable,resultDePlotable,
                                         resultGePlotable))
 
   endTime <- Sys.time()
   timeTaken <- round(endTime - startTime,2)
-
+  # plot
   plot = ggplot2::ggplot(resultsPlotable, aes(factor(method), y)) +
     geom_boxplot() +
     ylab(info$y.name)
-
+  # add info to plot
   if (showInfo == TRUE) {
     plot = EBO::addInfo(plot, info, timeTaken, repls)
   }

@@ -5,27 +5,42 @@
 \title{Benchmark and plot all optimizers which are implemented in EBO.}
 \usage{
 plotBenchmark(
-  instance,
-  psOpt,
+  task,
   funcEvals = 65,
   paramsMBO = data.table::data.table(NULL),
   paramsCMAESR = data.table::data.table(NULL),
   paramsES = data.table::data.table(NULL),
   paramsDE = data.table::data.table(NULL),
   paramsGE = data.table::data.table(NULL),
-  minimize = TRUE,
   repls = 25,
   showInfo = TRUE,
   ncpus = NA,
-  seed = 1
+  seed = 5
 )
+}
+\arguments{
+\item{funcEvals}{[\code{integer(1)}]\cr
+Define the amount of black-box function evaluations.}
+
+\item{repls}{[\code{integer(1)}]\cr
+Define how often each configuration is replicated for the benchmark.\cr
+Default is ten.}
+
+\item{ncpus}{[\code{numeric(1)}]\cr
+Define how many cpu cores are used for the benchmark.\cr
+Default is NA, which uses all cores minus one.}
+
+\item{seed}{[\code{numeric(1)}]\cr
+Define the seed used for the computation. Will be set by \code{batchtools}.
+Which means the jobs get the seed plus the job.id as their unique seed. \cr
+Default is one.}
 }
 \value{
 A plot containing one boxplot curve for each configurations benchmarked.
 }
 \description{
-This functions benchmarks the
-then plots them as boxplots wrt to their iterations.
+This functions benchmarks the optimization algorithms and
+then plots them as boxplots.
 }
 \references{
 Bernd Bischl, Jakob Richter, Jakob Bossek, Daniel Horn, Janek Thomas and Michel Lang; mlrMBO: A Modular Framework for Model-Based Optimization of Expensive Black-Box Functions, Preprint: \code{\link{https://arxiv.org/abs/1703.03373}} (2017).

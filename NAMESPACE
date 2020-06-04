@@ -2,6 +2,7 @@
 
 export(autoMbo)
 export(benchmarkDmbo)
+export(generateConfigdata)
 export(plotBenchmark)
 export(plotMboHyperparams)
 export(task)

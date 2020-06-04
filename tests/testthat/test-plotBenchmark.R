@@ -19,9 +19,17 @@ test_that("Test if works for mixed ps + every argument in use + maximize", {
     ParamHelpers::makeDiscreteParam("gas", values = c("nitrogen", "air", "argon")),
     ParamHelpers::makeDiscreteParam("cat", values = c("cat1","cat2","cat3"))
   )
+
   funcEvals = 60
 
-  plotBenchmark2 = plotBenchmark(instance, psOpt, funcEvals, minimize = FALSE, repls = 2, seed = 1)
+  task = task(
+    simulation = "regr.randomForest",
+    data = data,
+    target = "testTarget",
+    psOpt = psOpt,
+    minimize = FALSE
+  )
+  plotBenchmark2 = plotBenchmark(task, funcEvals, repls = 2, seed = 1)
 
   expect_equal(class(plotBenchmark2), c("gg", "ggplot"))
   expect_equal(length(plotBenchmark2), 9)

@@ -1,4 +1,5 @@
 addInfo = function(plot, info, timeTaken, repls) {
+  # add information to plot
   plot = plot +
     labs(title = paste("data:",info$dataName)) +
     labs(subtitle = paste(paste(" feature(s) name:", paste(info[["featureName"]], collapse = ", ")), '\n',
