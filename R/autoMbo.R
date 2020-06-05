@@ -15,7 +15,7 @@
 #'  Should information be plotted?\cr
 #'  Default is `TRUE`.
 #'
-#' @return A ggplot2 object.
+#' @return A ggplot2 object illustrating the benchmark of the tuned DMBO approach vs. the default SMBO.
 #'
 #' @export
 #'
@@ -58,6 +58,19 @@ autoMbo = function(data, target, minimize = FALSE, funcEvals,
                    minFuncEvals = 10, itersMboTune = 10, repls = 10,
                    showInfo = TRUE, ncpus = NA, seed = 1) {
 
+  data = as.data.frame(data)
+  checkmate::assertClass(data, classes = c("data.frame"))
+  checkmate::assertClass(target, classes = c("character"))
+  EBO::assertReplsNcpusSeed(repls, ncpus, seed)
+  checkmate::assertLogical(minimize, len = 1, any.missing = FALSE)
+  checkmate::assertLogical(showInfo, len = 1, any.missing = FALSE)
+  checkmate::assertIntegerish(itersMboTune, lower = 1, any.missing = TRUE,
+                              len = 1)
+  checkmate::assertIntegerish(minFuncEvals, lower = 1, any.missing = TRUE,
+                              len = 1)
+  checkmate::assertIntegerish(funcEvals, lower = 1, any.missing = TRUE,
+                              len = 1)
+
   set.seed(seed)
   startTime = Sys.time()
 
@@ -71,22 +84,37 @@ autoMbo = function(data, target, minimize = FALSE, funcEvals,
   # get info of the optimization problem
   info = EBO::getModelInfo(surrogateModel, psOpt, minimize)
 
-  # psTune default
-  psTune = ParamHelpers::makeParamSet(
-    ParamHelpers::makeDiscreteParam("crit", values = c("makeMBOInfillCritEI",
-                                                       "makeMBOInfillCritAEI",
-                                                       "makeMBOInfillCritCB",
-                                                       "makeMBOInfillCritAdaCB")),
-    ParamHelpers::makeIntegerParam("cb.lambda", lower = 1, upper = 5,
-                                   requires = quote(crit == "makeMBOInfillCritCB")),
-    ParamHelpers::makeIntegerParam("cb.lambda.start", lower = 3, upper = 10,
-                                   requires = quote(crit == "makeMBOInfillCritAdaCB")),
-    ParamHelpers::makeNumericParam("cb.lambda.end", lower = 0, upper = 3,
-                                   requires = quote(crit == "makeMBOInfillCritAdaCB")),
-    ParamHelpers::makeDiscreteParam("surrogate", values = c("regr.randomForest", "regr.km")),
-    ParamHelpers::makeDiscreteParam("covtype" ,values = c("gauss","matern5_2",
-                                                          "matern3_2","powexp"),
-                                    requires = quote(surrogate == "regr.km")))
+  # psTune
+  if (any(info$featureType == "factor")) {
+    psTune = ParamHelpers::makeParamSet(
+      ParamHelpers::makeDiscreteParam("crit", values = c("makeMBOInfillCritEI",
+                                                         "makeMBOInfillCritAEI",
+                                                         "makeMBOInfillCritCB",
+                                                         "makeMBOInfillCritAdaCB")),
+      ParamHelpers::makeIntegerParam("cb.lambda", lower = 1, upper = 5,
+                                     requires = quote(crit == "makeMBOInfillCritCB")),
+      ParamHelpers::makeIntegerParam("cb.lambda.start", lower = 3, upper = 10,
+                                     requires = quote(crit == "makeMBOInfillCritAdaCB")),
+      ParamHelpers::makeNumericParam("cb.lambda.end", lower = 0, upper = 3,
+                                     requires = quote(crit == "makeMBOInfillCritAdaCB")),
+      ParamHelpers::makeDiscreteParam("surrogate", values = c("regr.randomForest")))
+  } else {
+    psTune = ParamHelpers::makeParamSet(
+      ParamHelpers::makeDiscreteParam("crit", values = c("makeMBOInfillCritEI",
+                                                         "makeMBOInfillCritAEI",
+                                                         "makeMBOInfillCritCB",
+                                                         "makeMBOInfillCritAdaCB")),
+      ParamHelpers::makeIntegerParam("cb.lambda", lower = 1, upper = 5,
+                                     requires = quote(crit == "makeMBOInfillCritCB")),
+      ParamHelpers::makeIntegerParam("cb.lambda.start", lower = 3, upper = 10,
+                                     requires = quote(crit == "makeMBOInfillCritAdaCB")),
+      ParamHelpers::makeNumericParam("cb.lambda.end", lower = 0, upper = 3,
+                                     requires = quote(crit == "makeMBOInfillCritAdaCB")),
+      ParamHelpers::makeDiscreteParam("surrogate", values = c("regr.randomForest", "regr.km")),
+      ParamHelpers::makeDiscreteParam("covtype" ,values = c("gauss","matern5_2",
+                                                            "matern3_2","powexp"),
+                                      requires = quote(surrogate == "regr.km")))
+  }
 
   # drop kriging if parameter space of optimization is not only numeric or integer
 

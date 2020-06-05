@@ -1,4 +1,4 @@
-#' Benchmark and plot all optimizers which are implemented in EBO.
+#' Benchmark and plot all optimization algoritms connected to EBO.
 #'
 #'
 #' This functions benchmarks the optimization algorithms and
@@ -20,6 +20,17 @@ plotBenchmark = function(task, funcEvals = 65, paramsMBO = data.table::data.tabl
                          paramsCMAESR = data.table::data.table(NULL), paramsES = data.table::data.table(NULL),
                          paramsDE = data.table::data.table(NULL), paramsGE = data.table::data.table(NULL),
                          repls = 25, showInfo = TRUE, ncpus = NA, seed = 5) {
+
+  EBO::assertReplsNcpusSeed(repls, ncpus, seed)
+  checkmate::assertLogical(showInfo, len = 1, any.missing = FALSE)
+  checkmate::assertIntegerish(funcEvals, lower = 60, any.missing = TRUE,
+                              len = 1)
+  checkmate::assertClass(paramsMBO, classes = c("data.table", "data.frame"))
+  checkmate::assertClass(paramsCMAESR, classes = c("data.table", "data.frame"))
+  checkmate::assertClass(paramsES, classes = c("data.table", "data.frame"))
+  checkmate::assertClass(paramsDE, classes = c("data.table", "data.frame"))
+  checkmate::assertClass(paramsGE, classes = c("data.table", "data.frame"))
+
 
   startTime <- Sys.time()
   set.seed(1)

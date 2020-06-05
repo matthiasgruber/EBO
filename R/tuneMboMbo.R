@@ -86,6 +86,20 @@ tuneMboMbo = function(instance, psOpt, funcEvals, psTune, itersMboTune = 10,
                       minimize = FALSE, repls = 10, ncpus = NA, seed = 1,
                       designOpt = NULL, maxTime = NULL) {
 
+  EBO::assertReplsNcpusSeed(repls, ncpus, seed)
+  checkmate::assertLogical(minimize, len = 1, any.missing = FALSE)
+  checkmate::assertIntegerish(maxTime, lower = 1, any.missing = TRUE,
+                              len = 1, null.ok = TRUE)
+  checkmate::assertIntegerish(itersMboTune, lower = 1, any.missing = TRUE,
+                              len = 1)
+  designOpt = as.data.frame(designOpt)
+  checkmate::assertClass(designOpt, classes = c("data.frame"))
+  checkmate::assertIntegerish(funcEvals, lower = 1, any.missing = TRUE,
+                              len = 1)
+  if (getParamNr(psTune) == 0L) {
+    stop("No hyperparameters were passed!")
+  }
+
   set.seed(seed)
   info = EBO::getModelInfo(instance[[1]], psOpt, minimize)
 

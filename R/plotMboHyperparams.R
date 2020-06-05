@@ -66,7 +66,18 @@
 
 
 
-plotMboHyperparams = function(task, funcEvals, psParamPlot, resolution, repls, showInfo = TRUE, ncpus = NA, seed = 1) {
+plotMboHyperparams = function(task, funcEvals, psParamPlot, resolution,
+                              repls, showInfo = TRUE, ncpus = NA, seed = 1) {
+
+  EBO::assertReplsNcpusSeed(repls, ncpus, seed)
+  checkmate::assertLogical(showInfo, len = 1, any.missing = FALSE)
+  checkmate::assertIntegerish(funcEvals, lower = 1, any.missing = TRUE,
+                              len = 1)
+  checkmate::assertIntegerish(resolution, lower = 1, any.missing = TRUE,
+                              len = 1)
+  if (getParamNr(psParamPlot) == 0L) {
+    stop("No hyperparameters were passed!")
+  }
 
   set.seed(seed)
 
