@@ -19,6 +19,7 @@ test_that("Test if works for mixed ps + every argument in use + maximize", {
   funcEvals = 10
 
   psTune = ParamHelpers::makeParamSet(
+    ParamHelpers::makeIntegerParam("amountDesign", lower = 5, upper = 6),
     ParamHelpers::makeDiscreteParam("design", values = c("maximinLHS",
                                                          "optimumLHS")),
 
@@ -43,10 +44,11 @@ test_that("Test if works for mixed ps + every argument in use + maximize", {
 
   expect_equal(class(resTune), "data.frame")
   expect_equal(nrow(resTune), 1)
-  expect_equal(length(resTune), 5)
-  expect_equal(class(resTune[1,1]), "character")
+  expect_equal(length(resTune), 6)
+  expect_equal(class(resTune[1,1]), "integer")
   expect_equal(class(resTune[1,2]), "character")
   expect_equal(class(resTune[1,3]), "character")
   expect_equal(class(resTune[1,4]), "character")
-  expect_equal(class(resTune[1,5]), "numeric")
+  expect_equal(class(resTune[1,5]), "character")
+  expect_equal(class(resTune[1,6]), "numeric")
 })

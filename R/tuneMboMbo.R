@@ -1,6 +1,6 @@
-#' Tune SMBO hyperparameters.
+#' Tune SMBO hyperparameters by mlrMBO.
 #'
-#' This function tunes the SMBO hyperparameters. The user can
+#' This function tunes the SMBO hyperparameters by mlrMBO. The user can
 #' choose if the tuning is initialized with an initial design or not.
 #'
 #'
@@ -96,9 +96,8 @@ tuneMboMbo = function(instance, psOpt, funcEvals, psTune, itersMboTune = 10,
   checkmate::assertClass(designOpt, classes = c("data.frame"))
   checkmate::assertIntegerish(funcEvals, lower = 1, any.missing = TRUE,
                               len = 1)
-  if (getParamNr(psTune) == 0L) {
-    stop("No hyperparameters were passed!")
-  }
+  assertPsTune(psTune)
+
 
   set.seed(seed)
   info = EBO::getModelInfo(instance[[1]], psOpt, minimize)
