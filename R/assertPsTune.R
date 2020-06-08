@@ -1,6 +1,13 @@
 assertPsTune = function(psTune) {
   # check class
   checkmate::assertClass(psTune, classes = c("ParamSet"))
+  # check names of hyperparameters
+  name = names(psTune$pars)
+  for (i in 1:length(test)) {
+    checkmate::assertChoice(name[i], c("design","amountDesign","crit",
+                                       "surrogate","covtype","cb.lambda",
+                                       "cb.lambda.start","cb.lambda.end"))
+  }
   # stop if no hyperparameter space is passed
   if (getParamNr(psTune) == 0L) {
     stop("No hyperparameters were passed!")
@@ -66,6 +73,33 @@ assertPsTune = function(psTune) {
                                                                    "powexp"))) {
         stop("Tuning the kernels of kriging only works for: gauss, matern5_2, matern3_2 and powexp!")
       }
+    }
+  }
+  # check cb.lambda
+  if (!is.null(psTune[["pars"]][["cb.lambda"]])) {
+    if (!(psTune[["pars"]][["cb.lambda"]]$requires[[3]] == "makeMBOInfillCritCB")) {
+      stop("Tuning of cb.lambda has to be conntected to makeMBOInfillCritCB")
+    }
+    if (!psTune[["pars"]]$cb.lambda$type == "integer") {
+      stop("Tuning of cb.lambda only works if it is passed as an integer parameter!")
+    }
+  }
+  # check cb.lambda.start
+  if (!is.null(psTune[["pars"]][["cb.lambda.start"]])) {
+    if (!(psTune[["pars"]][["cb.lambda.start"]]$requires[[3]] == "makeMBOInfillCritAdaCB")) {
+      stop("Tuning of cb.lambda.start has to be conntected to makeMBOInfillCritAdaCB")
+    }
+    if (!psTune[["pars"]]$cb.lambda.start$type == "integer") {
+      stop("Tuning of cb.lambda.start only works if it is passed as an integer parameter!")
+    }
+  }
+  # check cb.lambda.end
+  if (!is.null(psTune[["pars"]][["cb.lambda.end"]])) {
+    if (!(psTune[["pars"]][["cb.lambda.end"]]$requires[[3]] == "makeMBOInfillCritAdaCB")) {
+      stop("Tuning of cb.lambda.end has to be conntected to makeMBOInfillCritAdaCB")
+    }
+    if (!psTune[["pars"]]$cb.lambda.end$type == "numeric") {
+      stop("Tuning of cb.lambda.end only works if it is passed as an numeric parameter!")
     }
   }
 }
