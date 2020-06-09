@@ -2,10 +2,17 @@
 #'
 #' This function tunes the SMBO hyperparameters by mlrMBO. The user can
 #' choose if the tuning is initialized with an initial design or not.
+#' You can either pass one instance or multiple instances of the same problem as a list.
+#' We recommend to tune the hyperparameters after a large amount of black-box function
+#' evaluations, as the tuning will fail if the user chooses an amount which is too low.
+#' During the hyperparameter optimization of EBO::tuneMboMbo(), the user is able to see
+#' in the console if the hyperparameters can be tuned successfully. If all hyperparameter
+#' sets return approximately the same median of the target variable, we recommend to continue the SMBO
+#' with the default hyperparameters.
 #'
-#'
-#' @param instance [\code{wrapped model}]\cr
-#'  A trained mlr model.
+#' @param instance [\code{list(1)}]\cr
+#'  A list containing the instance(s) as trained mlr learners.\cr
+#'  You can either pass one or multiple instances of the same problem.
 #' @param psOpt [\code{ParamHelpers::ParamSet()}]\cr
 #'  Parameter space for the optimization.
 #' @param funcEvals [\code{integer(1)}]\cr
@@ -86,6 +93,11 @@ tuneMboMbo = function(instance, psOpt, funcEvals, psTune, itersMboTune = 10,
                       minimize = FALSE, repls = 10, ncpus = NA, seed = 1,
                       designOpt = NULL, maxTime = NULL) {
 
+  # assertions
+  checkmate::assertList(instance, any.missing = FALSE, min.len = 1)
+  for (i in 1:length(instance)) {
+    checkmate::assertClass(instance[[1]], classes = "WrappedModel", null.ok = FALSE)
+  }
   EBO::assertReplsNcpusSeed(repls, ncpus, seed)
   checkmate::assertLogical(minimize, len = 1, any.missing = FALSE)
   checkmate::assertIntegerish(maxTime, lower = 1, any.missing = TRUE,
@@ -96,14 +108,15 @@ tuneMboMbo = function(instance, psOpt, funcEvals, psTune, itersMboTune = 10,
   checkmate::assertClass(designOpt, classes = c("data.frame"))
   checkmate::assertIntegerish(funcEvals, lower = 1, any.missing = TRUE,
                               len = 1)
-  assertPsTune(psTune)
+  EBO::assertPsTune(psTune)
 
-
+  # start of function
   set.seed(seed)
   info = EBO::getModelInfo(instance[[1]], psOpt, minimize)
 
+  # benchmark mlrMBO configuration
   getMedianBenchmarkMbo = function(x) {
-
+    # convert character string to mlrMBO objects
     listControlLearner = EBO::createMboControlSurrogate(x)
 
     if (is.null(designOpt)) designOpt = x$design
@@ -113,19 +126,19 @@ tuneMboMbo = function(instance, psOpt, funcEvals, psTune, itersMboTune = 10,
                            control = list(listControlLearner[[1]]),
                            surrogate = list(listControlLearner[[2]])
     )
-
+    # benchmark mlrMBO configuration
     resMboBenchmark = EBO::benchmarkMbo(instance, psOpt, funcEvals, paramsMBO, minimize, repls, ncpus, seed)
-
+    # get results
     results = NA
     for (i in 1:length(resMboBenchmark)) {
       results[i] = resMboBenchmark[[i]][["recommendedParameters"]][info$featureNumber+1]
     }
     #if (length(resMboBenchmark) != repls) warning() # add warning if a config failed
-
+    # get median
     median = median(unlist(results))
     return(median)
   }
-
+  # objective function for the tuning
   mboMboFuncMulti = smoof::makeSingleObjectiveFunction(
     name = "tuneMboMbo",
     fn = getMedianBenchmarkMbo,
@@ -133,19 +146,23 @@ tuneMboMbo = function(instance, psOpt, funcEvals, psTune, itersMboTune = 10,
     has.simple.signature = FALSE,
     minimize = minimize
   )
-
+  # make mlrMBO contro objects
   controlTune = mlrMBO::makeMBOControl(n.objectives = 1L, y.name = "y")
   controlTune = mlrMBO::setMBOControlInfill(controlTune, crit = mlrMBO::makeMBOInfillCritEI())
   if (!is.null(itersMboTune)) controlTune = mlrMBO::setMBOControlTermination(controlTune, iters = itersMboTune)
   if (!is.null(maxTime)) controlTune = mlrMBO::setMBOControlTermination(controlTune, time.budget = maxTime)
-
+  # generate initial design for the tuning
   design = ParamHelpers::generateDesign(n = 12, par.set = psTune, fun = lhs::maximinLHS)
-
+  # execute tuning
   resMboTune = mlrMBO::mbo(mboMboFuncMulti, design = design, control = controlTune, show.info = TRUE)
-
+  # get optimization path of the tuning
   hyperparamsPath = as.data.frame(resMboTune[["opt.path"]][["env"]][["path"]])
-
-  bestHyperparams = hyperparamsPath[which.max(hyperparamsPath$y),]
-
+  # get best suited hyperparameter set
+  if (minimize == FALSE) {
+    bestHyperparams = hyperparamsPath[which.max(hyperparamsPath$y),]
+  }
+  if (minimize == TRUE) {
+    bestHyperparams = hyperparamsPath[which.min(hyperparamsPath$y),]
+  }
   return(bestHyperparams)
 }

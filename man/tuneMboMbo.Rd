@@ -2,7 +2,7 @@
 % Please edit documentation in R/tuneMboMbo.R
 \name{tuneMboMbo}
 \alias{tuneMboMbo}
-\title{Tune SMBO hyperparameters.}
+\title{Tune SMBO hyperparameters by mlrMBO.}
 \usage{
 tuneMboMbo(
   instance,
@@ -19,8 +19,9 @@ tuneMboMbo(
 )
 }
 \arguments{
-\item{instance}{[\code{wrapped model}]\cr
-A trained mlr model.}
+\item{instance}{[\code{list(1)}]\cr
+A list containing the instance(s) as trained mlr learners.\cr
+You can either pass one or multiple instances of the same problem.}
 
 \item{psOpt}{[\code{ParamHelpers::ParamSet()}]\cr
 Parameter space for the optimization.}
@@ -60,11 +61,18 @@ This argument will overwrite itersMboTune and set a maximum time budget in secon
 for the tuning.}
 }
 \value{
-A data.frame containing the best hyperparameter set found.
+A data.frame containing the best suited hyperparameter set.
 }
 \description{
-This function tunes the SMBO hyperparameters. The user can
+This function tunes the SMBO hyperparameters by mlrMBO. The user can
 choose if the tuning is initialized with an initial design or not.
+You can either pass one instance or multiple instances of the same problem as a list.
+We recommend to tune the hyperparameters after a large amount of black-box function
+evaluations, as the tuning will fail if the user chooses an amount which is too low.
+During the hyperparameter optimization of EBO::tuneMboMbo(), the user is able to see
+in the console if the hyperparameters can be tuned successfully. If all hyperparameter
+sets return approximately the same median of the target variable, we recommend to continue the SMBO
+with the default hyperparameters.
 }
 \examples{
 \dontrun{

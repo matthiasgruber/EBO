@@ -56,11 +56,14 @@ Which means the jobs get the seed plus the job.id as their unique seed. \cr
 Default is one.}
 }
 \value{
-A ggplot2 object.
+A ggplot2 object illustrating the benchmark of the tuned DMBO approach vs. the default SMBO.
 }
 \description{
 This function tunes the DMBO hyperparameters and then plots the best DMBO configuration
-against the default SMBO configuration.
+against the default SMBO configuration. This function is simulating the material science workflow.
+It is recommended to use a problem which needs hundreds of black-box function evaluations to be solved,
+as it is not efficient for a too minor amount. The user has to define the maximum amount of allowed
+black-box function evaluations and when to switch the hyperparameters.
 }
 \examples{
 \dontrun{

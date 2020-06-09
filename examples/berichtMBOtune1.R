@@ -3,7 +3,7 @@ library(readr)
 
 
 # define problem 1
-kapton <- as.data.frame(readxl::read_excel("tests/testthat/data/kaptonArgon.xlsx"))
+kapton <- as.data.frame(readxl::read_excel("data/kaptonArgon.xlsx"))
 
 psOpt = makeParamSet(
   makeIntegerParam("power", lower = 10, upper = 5555),

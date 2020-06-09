@@ -3,7 +3,7 @@ assertPsTune = function(psTune) {
   checkmate::assertClass(psTune, classes = c("ParamSet"))
   # check names of hyperparameters
   name = names(psTune$pars)
-  for (i in 1:length(test)) {
+  for (i in 1:length(name)) {
     checkmate::assertChoice(name[i], c("design","amountDesign","crit",
                                        "surrogate","covtype","cb.lambda",
                                        "cb.lambda.start","cb.lambda.end"))
@@ -16,7 +16,7 @@ assertPsTune = function(psTune) {
   if (!is.null(psTune[["pars"]]$design)) {
     # check if initial design is passed as a discrete parameter set
     if (!psTune[["pars"]]$design$type == "discrete") {
-      stop("Tuning the initial design only works if it is passed as an discrete parameter!")
+      stop("Tuning the initial design only works if it is passed as a discrete parameter!")
     }
     # check if initial design is passed as LHS function or random
     if (isFALSE(psTune[["pars"]]$design$values %in% c("maximinLHS", "optimumLHS", "randomLHS",
@@ -37,7 +37,7 @@ assertPsTune = function(psTune) {
   if (!is.null(psTune[["pars"]]$crit)) {
     # check if initial design is passed as a discrete parameter set
     if (!psTune[["pars"]]$crit$type == "discrete") {
-      stop("Tuning the infill criterion only works if it is passed as an discrete parameter!")
+      stop("Tuning the infill criterion only works if it is passed as a discrete parameter!")
     }
     if (isFALSE(psTune[["pars"]]$crit$values %in% c("makeMBOInfillCritEI",
                                                     "makeMBOInfillCritAEI",

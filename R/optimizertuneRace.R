@@ -23,15 +23,15 @@
 #' @param optimizer [\code{character}]\cr
 #'  optimization algorithm which user want to tune \cr
 #'  possible optimization algorithms are: "optimizeMBO", "optimizeES", "optimizeDE",
-#'  "optimizeGenoud", "optimizeCmaesr"
+#'  "optimizeGenoud", "optimizeCmaesr"\cr
 #'  Default is `NA`.
-#'  @param plotAblation [\code{logical(1)}]\cr
+#' @param plotAblation [\code{logical(1)}]\cr
 #'  Should an ablation analysis be run with the tuning Result? \cr
 #'  Default is `FALSE`.
-#'  @param ablationFile [\code{character}]\cr
+#' @param ablationFile [\code{character}]\cr
 #'  Saving path for the ablation analysis. \cr
 #'  Default is `NA`.
-#'  @param configurationFile [\code{character}]\cr
+#' @param configurationFile [\code{character}]\cr
 #'  Use a txt file to define the source for ablation analysis \cr
 #'  We recommend using the default algorithm setting.
 #'  Default is `NA`.
@@ -41,37 +41,35 @@
 #' @param psTune [\code{ParamHelpers::ParamSet()}]\cr
 #'  Collection of hyperparameters and their constraints for the tuning, e.g. tuning of optimizer
 #'  In the following, the hyperparamter of the optimizer, which one can tune are summarized.
-#'  "optimizeMBO":
-#'     - design[string]: "maximinLHS", "randomLHS", "random", "optimLHS"
-#'     - surrogate[string]: "regr.randomForest", "regr.km"
-#'     - covtype[string]: "matern5_2","matern3_2", "powexp", "gauss"
-#'     - nodesize[integer]: default is ...
-#'     - mtry[integer]: default is ...
-#'     - crit[string]: "makeMBOInfillCritAEI","makeMBOInfillCritCB", "makeMBOInfillCritAdaCB","makeMBOInfillCritEI"
-#'     - cb.lambda[numeric]: defines cb.lambda from makeMBOInfillCritCB; default is 1
-#'     - cb.lambda.start[numeric]: defines cb.lambda.start from makeMBOInfillCritAdaCB; default is ...
-#'     - cb.lambda.end[numeric]:  defines cb.lambda.end from makeMBOInfillCritAdaCB; default is ...
-#'  "optimizeES":
+#'  "optimizeMBO":\cr
+#'     - design[string]: "maximinLHS", "randomLHS", "random", "optimLHS"\cr
+#'     - surrogate[string]: "regr.randomForest", "regr.km"\cr
+#'     - covtype[string]: "matern5_2","matern3_2", "powexp", "gauss"\cr
+#'     - crit[string]: "makeMBOInfillCritAEI","makeMBOInfillCritCB", "makeMBOInfillCritAdaCB","makeMBOInfillCritEI"\cr
+#'     - cb.lambda[numeric]: defines cb.lambda from makeMBOInfillCritCB; default is 1\cr
+#'     - cb.lambda.start[numeric]: defines cb.lambda.start from makeMBOInfillCritAdaCB; default is ...\cr
+#'     - cb.lambda.end[numeric]:  defines cb.lambda.end from makeMBOInfillCritAdaCB; default is ...\cr
+#'  "optimizeES":\cr
 #'     - nu[integer]: selection pressure. That means, number of offspring (lambda) is
-#'           mue multiplied with nu. Default is 10
-#'     - mue[integer]: number of parents, default is 10
-#'     - sigmaInit[numeric]: initial sigma value (step size), default is 1.0
-#'     - nSigma[integer]: number of different sigmas, default is 1
-#'     - mutation[integer]: string of mutation type, default is 1
+#'           mue multiplied with nu. Default is 10\cr
+#'     - mue[integer]: number of parents, default is 10\cr
+#'     - sigmaInit[numeric]: initial sigma value (step size), default is 1.0\cr
+#'     - nSigma[integer]: number of different sigmas, default is 1\cr
+#'     - mutation[integer]: string of mutation type, default is 1\cr
 #'     - tau[numeric]: number, learning parameter for self adaption,
-#'            i.e. the local multiplier for step sizes (for each dimension).default is 1.0
+#'            i.e. the local multiplier for step sizes (for each dimension).default is 1.0\cr
 #'     - stratReco[integer]: Recombination operator for strategy variables. 1: none.
 #'                  2: dominant/discrete (default). 3: intermediate.
-#'                  4: variation of intermediate recombination.
+#'                  4: variation of intermediate recombination.\cr
 #'     - objReco[integer]: Recombination operator for object variables. 1: none. 2: dominant/discrete (default).
-#'                3: intermediate. 4: variation of intermediate recombination.
-#'  "optimizeGenoud":
-#'     - populationSize[integer]: Number of individuals in the population. Default is 10*dimension.
-#'  "optimizeDE":
-#'     - populationSize[integer]: Number of particles in the population. Default is 10*dimension.
-#'  "optimizeCmaesr":
-#'     - sigma[numeric(1)]: Initial step-size. Default is 0.5.
-#'     - lambda[integer(1)]: Number of offspring generated in each generation.
+#'                3: intermediate. 4: variation of intermediate recombination.\cr
+#'  "optimizeGenoud":\cr
+#'     - populationSize[integer]: Number of individuals in the population. Default is 10*dimension.\cr
+#'  "optimizeDE":\cr
+#'     - populationSize[integer]: Number of particles in the population. Default is 10*dimension.\cr
+#'  "optimizeCmaesr":\cr
+#'     - sigma[numeric(1)]: Initial step-size. Default is 0.5.\cr
+#'     - lambda[integer(1)]: Number of offspring generated in each generation.\cr
 #'
 #'
 #'
@@ -224,9 +222,6 @@ optimizertuneRace = function(optimizer,
                              plotAblation = FALSE, ablationFile = NA, firstTest = 6,
                              test = "F-test", seed = 1) {
 
-  # transform into irace parameter set
-  psTune <- ParamHelpers::convertParamSetToIrace(psTune)
-
   # assertions
   checkmate::assertChoice(optimizer, c("optimizeMBO", "optimizeES", "optimizeDE", "optimizeGenoud",
                                        "optimizeCmaesr"))
@@ -346,6 +341,8 @@ optimizertuneRace = function(optimizer,
 
 
 
+  # transform into irace parameter set
+  psTune <- ParamHelpers::convertParamSetToIrace(psTune)
 
   target.runner = function(experiment, scenario) {
     debugLevel    = scenario$debugLevel

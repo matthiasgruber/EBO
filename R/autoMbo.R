@@ -1,7 +1,10 @@
 #' Tune DMBO and plot vs SMBO default
 #'
 #' This function tunes the DMBO hyperparameters and then plots the best DMBO configuration
-#' against the default SMBO configuration.
+#' against the default SMBO configuration. This function is simulating the material science workflow.
+#' It is recommended to use a problem which needs hundreds of black-box function evaluations to be solved,
+#' as it is not efficient for a too minor amount. The user has to define the maximum amount of allowed
+#' black-box function evaluations and when to switch the hyperparameters.
 #'
 #' @inheritParams tuneMboMbo
 #'
@@ -57,7 +60,7 @@
 autoMbo = function(data, target, minimize = FALSE, funcEvals,
                    minFuncEvals = 10, itersMboTune = 10, repls = 10,
                    showInfo = TRUE, ncpus = NA, seed = 1) {
-
+  # assertions
   data = as.data.frame(data)
   checkmate::assertClass(data, classes = c("data.frame"))
   checkmate::assertClass(target, classes = c("character"))

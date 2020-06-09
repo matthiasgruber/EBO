@@ -2,7 +2,7 @@
 % Please edit documentation in R/plotBenchmark.R
 \name{plotBenchmark}
 \alias{plotBenchmark}
-\title{Benchmark and plot all optimizers which are implemented in EBO.}
+\title{Benchmark and plot all optimization algoritms connected to EBO.}
 \usage{
 plotBenchmark(
   task,

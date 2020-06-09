@@ -1,4 +1,4 @@
-kapton = as.data.frame(readxl::read_excel("data/grapheneArgon.xlsx"))
+grapheneArgon = as.data.frame(readxl::read_excel("data/grapheneArgon.xlsx"))
 
 # define parameter spce
 psOpt = makeParamSet(
@@ -8,9 +8,9 @@ psOpt = makeParamSet(
 )
 
 # create task
-task_Kapton = EBO::task(
+task_grapheneArgon = EBO::task(
   simulation = "regr.randomForest",
-  data = kapton,
+  data = grapheneArgon,
   target = "ratio",
   psOpt = psOpt,
   minimize = FALSE
@@ -38,7 +38,7 @@ namesBoxplot = c("mlrMBO default",
 funcEvals = 55
 
 # generate Data
-kaptConfigResults = EBO::generateConfigdata(task_Kapton, funcEvals = funcEvals, paramsMBO,
+kaptConfigResults = EBO::generateConfigdata(task_grapheneArgon, funcEvals = funcEvals, paramsMBO,
                                             namesBoxplot = namesBoxplot, repls = 20, seed = 1235)
 
 
