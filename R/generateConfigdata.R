@@ -155,8 +155,10 @@ generateConfigdata = function(task, funcEvals = 50, paramsMBO = NULL,
   }
   # features from parameter space must be identical with features from data
   numberFeatures = ncol(task[[4]])-1
-  if (isFALSE(names(task[[6]][["pars"]][1:numberFeatures]) == names(task[[4]][1:numberFeatures]))) {
-    stop("data variables must be identical with ParamSet variables!")
+  for(r in 1:numberFeatures) {
+    if ((names(task[[6]][["pars"]][3]) %in% names(task[[4]][1:numberFeatures]))==FALSE) {
+      stop("data variables must be identical with ParamSet variables!")
+    }
   }
 
   # assertions for target
