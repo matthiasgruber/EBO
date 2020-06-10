@@ -4,7 +4,7 @@ library(readr)
 set.seed(1)
 
 # define problem 1
-graphene <- as.data.frame(readxl::read_excel("tests/testthat/data/grapheneArgon.xlsx"))
+graphene <- as.data.frame(readxl::read_excel("examples/data/grapheneArgon.xlsx"))
 
 psOpt = makeParamSet(
 
@@ -24,7 +24,7 @@ task_Graphene = task(
 )
 
 # define problem 2
-kapton <- as.data.frame(readxl::read_excel("tests/testthat/data/kapton_argon.xlsx"))
+kapton <- as.data.frame(readxl::read_excel("examples/data/kapton_argon.xlsx"))
 
 psOpt = makeParamSet(
 
@@ -79,7 +79,7 @@ psTune = ParamHelpers::makeParamSet(
 
 tuneResults3 = optimizertuneRace("optimizeMBO", psTune,
                                 funcEvals = 55, itersTune = 1000, trainInstanceList = problemList,
-                                minimize = FALSE, configurationsFile = "configurations.txt",
+                                minimize = FALSE, configurationsFile = "examples/configurations.txt",
                                 plotAblation = TRUE, ablationFile = "ablationMBOPlot3.pdf", seed = 1)
 
 

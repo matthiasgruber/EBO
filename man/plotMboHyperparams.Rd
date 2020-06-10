@@ -46,7 +46,7 @@ Default is one.}
 A 1D or 2D ggplot2 object to investigate the effect of the hyperparameters.
 }
 \description{
-This functions benchmarks the \code{mlrMBO::mbo()} function on different configurations and
+This functions benchmarks the \code{mlrMBO::mbo()} function with different configurations and
 then plots them wrt the hyperparameters.
 }
 \examples{

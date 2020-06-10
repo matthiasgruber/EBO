@@ -101,7 +101,7 @@ generateProblemList = function(...) {
       stop("each task must be a list!")
     }
     #check if correct number of elements
-    if (length(taskList[[i]]) != "7") {
+    if (length(taskList[[i]]) != 7) {
       stop("each task must have length 7!")
     }
     # check names and class of sublists

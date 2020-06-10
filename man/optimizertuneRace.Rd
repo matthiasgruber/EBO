@@ -2,7 +2,7 @@
 % Please edit documentation in R/optimizertuneRace.R
 \name{optimizertuneRace}
 \alias{optimizertuneRace}
-\title{plot boxplot curves of \code{mlrMBO::mbo()} optimization runs}
+\title{Tuning of optimization algorithms}
 \usage{
 optimizertuneRace(
   optimizer,
@@ -23,20 +23,26 @@ optimizertuneRace(
 \item{optimizer}{[\code{character}]\cr
 optimization algorithm which user want to tune \cr
 possible optimization algorithms are: "optimizeMBO", "optimizeES", "optimizeDE",
-"optimizeGenoud", "optimizeCmaesr"\cr
+"optimizeGenoud", "optimizeCmaesr"
 Default is `NA`.}
 
 \item{psTune}{[\code{ParamHelpers::ParamSet()}]\cr
-Collection of hyperparameters and their constraints for the tuning, e.g. tuning of optimizer
-In the following, the hyperparamter of the optimizer, which one can tune are summarized.
+Collection of hyperparameters and their constraints for the tuning, e.g. tuning of optimizer\cr
+In the following, the hyperparamter of the optimizer, which one can tune are summarized.\cr
 "optimizeMBO":\cr
-   - design[string]: "maximinLHS", "randomLHS", "random", "optimLHS"\cr
+   - design[string]: "maximinLHS", "randomLHS", "random", "optimumLHS", "augmentLHS",
+                     "geneticLHS", "improvedLHS", "optAugmentLHS"\cr
    - surrogate[string]: "regr.randomForest", "regr.km"\cr
+   - amountDesign[integer]: defines number of initial design points. default is number of features + 1.\cr
    - covtype[string]: "matern5_2","matern3_2", "powexp", "gauss"\cr
-   - crit[string]: "makeMBOInfillCritAEI","makeMBOInfillCritCB", "makeMBOInfillCritAdaCB","makeMBOInfillCritEI"\cr
-   - cb.lambda[numeric]: defines cb.lambda from makeMBOInfillCritCB; default is 1\cr
-   - cb.lambda.start[numeric]: defines cb.lambda.start from makeMBOInfillCritAdaCB; default is ...\cr
-   - cb.lambda.end[numeric]:  defines cb.lambda.end from makeMBOInfillCritAdaCB; default is ...\cr
+   - nodesize[integer]: default is ...\cr
+   - mtry[integer]: default is ...\cr
+   - crit[string]: "makeMBOInfillCritAEI","makeMBOInfillCritCB", "makeMBOInfillCritAdaCB","makeMBOInfillCritEI",
+                   "makeMBOInfillCritEQI", "makeMBOInfillCritMeanResponse", "makeMBOInfillCritStandardError"\cr
+   - cb.lambda[numeric]: defines cb.lambda from makeMBOInfillCritCB; default is 1 for fully numeric parameter set and 2 otherwise\cr
+   - cb.lambda.start[numeric]: defines cb.lambda.start from makeMBOInfillCritAdaCB\cr
+   - cb.lambda.end[numeric]:  defines cb.lambda.end from makeMBOInfillCritAdaCB\cr
+   - eqi.beta[numeric]: Beta parameter for expected quantile improvement criterion. Default is 0.75.\cr
 "optimizeES":\cr
    - nu[integer]: selection pressure. That means, number of offspring (lambda) is
          mue multiplied with nu. Default is 10\cr
@@ -56,20 +62,28 @@ In the following, the hyperparamter of the optimizer, which one can tune are sum
 "optimizeDE":\cr
    - populationSize[integer]: Number of particles in the population. Default is 10*dimension.\cr
 "optimizeCmaesr":\cr
-   - sigma[numeric(1)]: Initial step-size. Default is 0.5.\cr
-   - lambda[integer(1)]: Number of offspring generated in each generation.\cr}
+   - sigma[numeric]: Initial step-size. Default is 0.5.\cr
+   - lambda[integer]: Number of offspring generated in each generation.\cr}
 
 \item{funcEvals}{[\code{integer(1)}]\cr
 Define the number of function evaluations.\cr
 Default is 50.}
 
 \item{itersTune}{[\code{integer(1)}]\cr
-Define the tuning budget used for tuning with \code{irace}
+Define the tuning budget used for tuning with \code{irace}\cr
 Default is 1000.}
+
+\item{trainInstanceList}{[\code{list()}]\cr
+Define list with instances / problems, which were defined with EBO::generateProblemList().\cr}
 
 \item{minimize}{[\code{logical(1)}]\cr
 Should the target be minimized? \cr
 Default is `TRUE`.}
+
+\item{configurationsFile}{[\code{character}]\cr
+Use a .txt file to define the source for ablation analysis \cr
+We recommend using the default algorithm setting.
+Default is `NA`.}
 
 \item{plotAblation}{[\code{logical(1)}]\cr
 Should an ablation analysis be run with the tuning Result? \cr
@@ -80,7 +94,7 @@ Saving path for the ablation analysis. \cr
 Default is `NA`.}
 
 \item{firstTest}{[\code{integer(1)}]\cr
-defines how many instances are evaluated, before the first test \code{irace}
+defines how many instances are evaluated, before the first test \code{irace}\cr
 Default is 6.}
 
 \item{test}{[\code{character}]\cr
@@ -90,34 +104,12 @@ Default is `F-test`.}
 \item{seed}{[\code{numeric(1)}]\cr
 Define the seed used for the computation. Will be set by \code{irace}.
 Default is one.}
-
-\item{psOpt}{[\code{ParamHelpers::ParamSet()}]\cr
-Collection of parameters and their constraints for problem optimization}
-
-\item{simulation}{[\code{character}]\cr
-The black box function e.g. model for the \code{mlrMBO}
-Default is `regr.randomForest`.}
-
-\item{task}{[\code{EBO:: task()}]\cr
-Task defines the problem setting.}
-
-\item{generateProblemList}{[\code{EBO::generateProblemList()}]\cr
-Define list with instances e.g. tasks, which are used for tuning.\cr}
-
-\item{traininstanceList}{[\code{EBO:: task()}]\cr
-Define list with instances, which are used for tuning.\cr}
-
-\item{configurationFile}{[\code{character}]\cr
-Use a txt file to define the source for ablation analysis \cr
-We recommend using the default algorithm setting.
-Default is `NA`.}
 }
 \value{
-A plot containing one boxplot curve for each configurations benchmarked.
+Elite configurations for defined tasks and an ablation analysis if plotAblation = TRUE.
 }
 \description{
-This functions benchmarks the \code{mlrMBO::mbo()} function on different configuration and
-then plots them as boxplots wrt to their iterations.
+This functions enables users to tune the hyperparameters of different optimization algorithms.
 }
 \examples{
 \dontrun{
@@ -178,11 +170,10 @@ task2 = task(
  minimize = FALSE
 )
 
-taskList = list(task1, task2)
 
 ################## Define problemList #############
 
-problemList = generateProblemList(taskList)
+problemList = generateProblemList(task1, task2)
 
 
 ### tune SMBO algorithm
@@ -243,7 +234,8 @@ tuneResultsES = optimizertuneRace("optimizeES", psTune,
 \references{
 [\code{mlrMBO::mbo()}]
 
-Bernd Bischl, Jakob Richter, Jakob Bossek, Daniel Horn, Janek Thomas and Michel Lang; mlrMBO: A Modular Framework for Model-Based Optimization of Expensive Black-Box Functions, Preprint: \code{\link{https://arxiv.org/abs/1703.03373}} (2017).
+Manuel López-Ibànez, Leslie Pérez Cáceres, Jérémie Dubois-Lacoste, Thomas Stützle and Mauro Birattari, The irace Package:
+User Guide. Preprint: \code{\link{https://cran.r-project.org/web/packages/irace/vignettes/irace-package.pdf}} (2019).
 }
 \seealso{
 \code{\link{optimize::plotBenchmark()}} \code{\link{optimize::plotMboContourPlot()}}

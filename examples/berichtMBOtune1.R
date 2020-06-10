@@ -3,7 +3,7 @@ library(readr)
 
 
 # define problem 1
-kapton <- as.data.frame(readxl::read_excel("data/kaptonArgon.xlsx"))
+kapton <- as.data.frame(readxl::read_excel("examples/data/kaptonArgon.xlsx"))
 
 psOpt = makeParamSet(
   makeIntegerParam("power", lower = 10, upper = 5555),
@@ -20,7 +20,7 @@ task_Kapton = task(
 )
 
 # define problem 2
-synthesis <- as.data.frame(readxl::read_excel("tests/testthat/data/synthesis.xlsx"))
+synthesis <- as.data.frame(readxl::read_excel("examples/data/synthesis.xlsx"))
 
 psOpt = ParamHelpers::makeParamSet(
   ParamHelpers::makeNumericParam("f", lower = 0, upper = 0.25),
@@ -37,12 +37,9 @@ task_Synthesis = task(
   minimize = FALSE
 )
 
-
-taskList = list(task_Kapton, task_Synthesis)
-
 ################## Define problemList #############
 
-problemList = generateProblemList(taskList)
+problemList = generateProblemList(task_Kapton, task_Synthesis)
 
 ### 2.4 tuneMBO
 set.seed(1)
@@ -75,7 +72,7 @@ psTune = ParamHelpers::makeParamSet(
 
 tuneResults = optimizertuneRace("optimizeMBO", psTune,
                                 funcEvals = 55, itersTune = 1000, trainInstanceList = problemList,
-                                minimize = FALSE, configurationsFile = "tests/testthat/configurations.txt",
+                                minimize = FALSE, configurationsFile = "examples/configurations.txt",
                                 plotAblation = TRUE, ablationFile = "ablationMBOPlot.pdf", seed = 1)
 
 

@@ -20,6 +20,7 @@
 #'  Task defines the problem setting.
 #'
 #' @return List with relevant informations of a specific problem.
+#' @export
 #'
 #'  @examples
 #' \dontrun{

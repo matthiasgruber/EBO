@@ -4,7 +4,7 @@ computeDE = function(reg, objEncoded, configDE, repls) {
   addExperiments(prob.designs = objEncoded, algo.designs = configDE, repls = repls, reg = reg)
 }
 
-configDEFunc = function(instance, funcEvals = 50, populationSize = NA, ...) {
+configDEFunc = function(instance, funcEvals = 50, populationSize = NULL, ...) {
 
   # wrapper in order to use SPOT optimization algorithms
 

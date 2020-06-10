@@ -1,5 +1,5 @@
 # get the data
-synthesis = openxlsx::read.xlsx("data/synthesis.xlsx")
+synthesis = openxlsx::read.xlsx("examples/data/synthesis.xlsx")
 
 psOpt = ParamHelpers::makeParamSet(
   ParamHelpers::makeNumericParam("f", lower = 0, upper = 0.25),
@@ -23,7 +23,7 @@ plotBenchmark2 = EBO::plotBenchmark(synthesisTask, funcEvals, repls = 20)
 
 
 # get the data
-kaptonArgon = openxlsx::read.xlsx("data/kaptonArgon.xlsx")
+kaptonArgon = openxlsx::read.xlsx("examples/data/kaptonArgon.xlsx")
 
 psOpt = ParamHelpers::makeParamSet(
   ParamHelpers::makeIntegerParam("power", lower = 10, upper = 5555),
@@ -33,8 +33,8 @@ psOpt = ParamHelpers::makeParamSet(
 
 kaptonTask = task(
   simulation = "regr.randomForest",
-  data = synthesis,
-  target = "interface",
+  data = kaptonArgon,
+  target = "ratio",
   psOpt = psOpt,
   minimize = FALSE
 )

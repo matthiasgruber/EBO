@@ -16,10 +16,12 @@ configESFunc = function(instance, funcEvals = 50, nu = 10, mue = 10, sigmaInit =
 
   psOpt = getParamSet(instance[[1]])
 
+  seed = as.integer(runif(1, 1, 1000))
+
   res <- SPOT::optimES(fun = fun2, lower = getLower(psOpt), upper = getUpper(psOpt),
                  control = list(funEvals = funcEvals, nu = nu, mue = mue, sigmaInit = sigmaInit,
                                 nSigma = nSigma, mutation = mutation, tau = tau,
-                                stratReco = stratReco, objReco = objReco))
+                                stratReco = stratReco, objReco = objReco, seed = seed))
 
   y = as.data.frame(res[["ybest"]])
   x = as.data.frame(res[["xbest"]])

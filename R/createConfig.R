@@ -17,26 +17,26 @@ createConfigCmaesr = function(funcEvals, configCmaesr) {
 
 createConfigEs = function(funcEvals, configEs) {
   configEs = cbind(funcEvals, configEs)
-  SpotES = list(
-    SpotES = configEs
+  es = list(
+    es = configEs
   )
-  return(SpotES)
+  return(es)
 }
 
 createConfigDe = function(funcEvals, configDe) {
   configDe = cbind(funcEvals, configDe)
-  SpotDE = list(
-    SpotDE = configDe
+  de = list(
+    de = configDe
   )
-  return(SpotDE)
+  return(de)
 }
 
 createConfigGe = function(funcEvals, configGe) {
   configGe = cbind(funcEvals, configGe)
-  SpotGE = list(
-    SpotGE = configGe
+  ge = list(
+    ge = configGe
   )
-  return(SpotGE)
+  return(ge)
 }
 
 createConfigRacing = function(funcEvals) {

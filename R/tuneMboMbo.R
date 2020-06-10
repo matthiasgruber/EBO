@@ -146,7 +146,7 @@ tuneMboMbo = function(instance, psOpt, funcEvals, psTune, itersMboTune = 10,
     has.simple.signature = FALSE,
     minimize = minimize
   )
-  # make mlrMBO contro objects
+  # make mlrMBO control objects
   controlTune = mlrMBO::makeMBOControl(n.objectives = 1L, y.name = "y")
   controlTune = mlrMBO::setMBOControlInfill(controlTune, crit = mlrMBO::makeMBOInfillCritEI())
   if (!is.null(itersMboTune)) controlTune = mlrMBO::setMBOControlTermination(controlTune, iters = itersMboTune)

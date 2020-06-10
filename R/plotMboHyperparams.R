@@ -1,6 +1,6 @@
 #' Benchmark and plot \code{mlrMBO::mbo()} optimization runs to investigate hyperparameters
 #'
-#' This functions benchmarks the \code{mlrMBO::mbo()} function on different configurations and
+#' This functions benchmarks the \code{mlrMBO::mbo()} function with different configurations and
 #' then plots them wrt the hyperparameters.
 #'
 #' @inheritParams tuneMboMbo

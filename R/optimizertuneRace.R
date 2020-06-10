@@ -2,19 +2,10 @@
 #'
 #' This functions enables users to tune the hyperparameters of different optimization algorithms.
 #'
-#' @param psOpt [\code{ParamHelpers::ParamSet()}]\cr
-#'  Collection of parameters and their constraints for problem optimization
-#' @param simulation [\code{character}]\cr
-#'  The black box function e.g. model for the \code{mlrMBO}
-#'  Default is `regr.randomForest`.
 #' @param minimize [\code{logical(1)}]\cr
 #'  Should the target be minimized? \cr
 #'  Default is `TRUE`.
-#' @param task [\code{EBO:: task()}]\cr
-#'  Task defines the problem setting.
-#' @param generateProblemList [\code{EBO::generateProblemList()}]\cr
-#'  Define list with instances e.g. tasks, which are used for tuning.\cr
-#' @param traininstanceList [\code{list()}]\cr
+#' @param trainInstanceList [\code{list()}]\cr
 #'  Define list with instances / problems, which were defined with EBO::generateProblemList().\cr
 #' @param funcEvals [\code{integer(1)}]\cr
 #'  Define the number of function evaluations.\cr
@@ -24,13 +15,13 @@
 #'  possible optimization algorithms are: "optimizeMBO", "optimizeES", "optimizeDE",
 #'  "optimizeGenoud", "optimizeCmaesr"
 #'  Default is `NA`.
-#'  @param plotAblation [\code{logical(1)}]\cr
+#' @param plotAblation [\code{logical(1)}]\cr
 #'  Should an ablation analysis be run with the tuning Result? \cr
 #'  Default is `FALSE`.
-#'  @param ablationFile [\code{character}]\cr
+#' @param ablationFile [\code{character}]\cr
 #'  Saving path for the ablation analysis. \cr
 #'  Default is `NA`.
-#'  @param configurationFile [\code{character}]\cr
+#' @param configurationsFile [\code{character}]\cr
 #'  Use a .txt file to define the source for ablation analysis \cr
 #'  We recommend using the default algorithm setting.
 #'  Default is `NA`.
@@ -38,49 +29,49 @@
 #'  Define the seed used for the computation. Will be set by \code{irace}.
 #'  Default is one.
 #' @param psTune [\code{ParamHelpers::ParamSet()}]\cr
-#'  Collection of hyperparameters and their constraints for the tuning, e.g. tuning of optimizer
-#'  In the following, the hyperparamter of the optimizer, which one can tune are summarized.
-#'  "optimizeMBO":
+#'  Collection of hyperparameters and their constraints for the tuning, e.g. tuning of optimizer\cr
+#'  In the following, the hyperparamter of the optimizer, which one can tune are summarized.\cr
+#'  "optimizeMBO":\cr
 #'     - design[string]: "maximinLHS", "randomLHS", "random", "optimumLHS", "augmentLHS",
-#'                       "geneticLHS", "improvedLHS", "optAugmentLHS"
-#'     - surrogate[string]: "regr.randomForest", "regr.km"
-#'     - amount[integer]: defines number of initial design points. default is number of features + 1.
-#'     - covtype[string]: "matern5_2","matern3_2", "powexp", "gauss"
-#'     - nodesize[integer]: default is ...
-#'     - mtry[integer]: default is ...
-#'     - crit[string]: "makeMBOInfillCritAEI","makeMBOInfillCritCB", "makeMBOInfillCritAdaCB","makeMBOInfillCritEI", "makeMBOInfillCritDIB",
-#'                     "makeMBOInfillCritEQI", "makeMBOInfillCritMeanResponse", "makeMBOInfillCritStandardError"
-#'     - cb.lambda[numeric]: defines cb.lambda from makeMBOInfillCritCB; default is 1 for fully numeric parameter set and 2 otherwise
-#'     - cb.lambda.start[numeric]: defines cb.lambda.start from makeMBOInfillCritAdaCB
-#'     - cb.lambda.end[numeric]:  defines cb.lambda.end from makeMBOInfillCritAdaCB
-#'     - eqi.beta[numeric]: Beta parameter for expected quantile improvement criterion. Default is 0.75.
-#'  "optimizeES":
+#'                       "geneticLHS", "improvedLHS", "optAugmentLHS"\cr
+#'     - surrogate[string]: "regr.randomForest", "regr.km"\cr
+#'     - amountDesign[integer]: defines number of initial design points. default is number of features + 1.\cr
+#'     - covtype[string]: "matern5_2","matern3_2", "powexp", "gauss"\cr
+#'     - nodesize[integer]: default is ...\cr
+#'     - mtry[integer]: default is ...\cr
+#'     - crit[string]: "makeMBOInfillCritAEI","makeMBOInfillCritCB", "makeMBOInfillCritAdaCB","makeMBOInfillCritEI",
+#'                     "makeMBOInfillCritEQI", "makeMBOInfillCritMeanResponse", "makeMBOInfillCritStandardError"\cr
+#'     - cb.lambda[numeric]: defines cb.lambda from makeMBOInfillCritCB; default is 1 for fully numeric parameter set and 2 otherwise\cr
+#'     - cb.lambda.start[numeric]: defines cb.lambda.start from makeMBOInfillCritAdaCB\cr
+#'     - cb.lambda.end[numeric]:  defines cb.lambda.end from makeMBOInfillCritAdaCB\cr
+#'     - eqi.beta[numeric]: Beta parameter for expected quantile improvement criterion. Default is 0.75.\cr
+#'  "optimizeES":\cr
 #'     - nu[integer]: selection pressure. That means, number of offspring (lambda) is
-#'           mue multiplied with nu. Default is 10
-#'     - mue[integer]: number of parents, default is 10
-#'     - sigmaInit[numeric]: initial sigma value (step size), default is 1.0
-#'     - nSigma[integer]: number of different sigmas, default is 1
-#'     - mutation[integer]: string of mutation type, default is 1
+#'           mue multiplied with nu. Default is 10\cr
+#'     - mue[integer]: number of parents, default is 10\cr
+#'     - sigmaInit[numeric]: initial sigma value (step size), default is 1.0\cr
+#'     - nSigma[integer]: number of different sigmas, default is 1\cr
+#'     - mutation[integer]: string of mutation type, default is 1\cr
 #'     - tau[numeric]: number, learning parameter for self adaption,
-#'            i.e. the local multiplier for step sizes (for each dimension).default is 1.0
+#'            i.e. the local multiplier for step sizes (for each dimension).default is 1.0\cr
 #'     - stratReco[integer]: Recombination operator for strategy variables. 1: none.
 #'                  2: dominant/discrete (default). 3: intermediate.
-#'                  4: variation of intermediate recombination.
+#'                  4: variation of intermediate recombination.\cr
 #'     - objReco[integer]: Recombination operator for object variables. 1: none. 2: dominant/discrete (default).
-#'                3: intermediate. 4: variation of intermediate recombination.
-#'  "optimizeGenoud":
-#'     - populationSize[integer]: Number of individuals in the population. Default is 10*dimension.
-#'  "optimizeDE":
-#'     - populationSize[integer]: Number of particles in the population. Default is 10*dimension.
-#'  "optimizeCmaesr":
-#'     - sigma[numeric(1)]: Initial step-size. Default is 0.5.
-#'     - lambda[integer(1)]: Number of offspring generated in each generation.
+#'                3: intermediate. 4: variation of intermediate recombination.\cr
+#'  "optimizeGenoud":\cr
+#'     - populationSize[integer]: Number of individuals in the population. Default is 10*dimension.\cr
+#'  "optimizeDE":\cr
+#'     - populationSize[integer]: Number of particles in the population. Default is 10*dimension.\cr
+#'  "optimizeCmaesr":\cr
+#'     - sigma[numeric]: Initial step-size. Default is 0.5.\cr
+#'     - lambda[integer]: Number of offspring generated in each generation.\cr
 #'
 #' @param itersTune [\code{integer(1)}]\cr
-#'   Define the tuning budget used for tuning with \code{irace}
+#'   Define the tuning budget used for tuning with \code{irace}\cr
 #'   Default is 1000.
 #' @param firstTest [\code{integer(1)}]\cr
-#'   defines how many instances are evaluated, before the first test \code{irace}
+#'   defines how many instances are evaluated, before the first test \code{irace}\cr
 #'   Default is 6.
 #' @param test [\code{character}]\cr
 #'  Defines the test used for the iRace tuning procedure \cr
@@ -238,7 +229,7 @@ optimizertuneRace = function(optimizer,
   #itersTune assertions works within the iRace package
 
   # assertion on psTune
-  if (optimizer == "optimizeMBO") {EBO::assertPsTuneMBO(psTune)}
+  if (optimizer == "optimizeMBO") {EBO::assertPsTune(psTune)}
 
   if (optimizer == "optimizeES") {EBO::assertPsTuneES(psTune)}
 

@@ -19,12 +19,39 @@ plotBenchmark(
 )
 }
 \arguments{
+\item{task}{[\code{EBO:: task()}]\cr
+Task defines the problem setting.}
+
 \item{funcEvals}{[\code{integer(1)}]\cr
 Define the amount of black-box function evaluations.}
+
+\item{paramsMBO}{[\code{data.table::data.table()}]\cr
+A data.table containing design, amountDesign, control and surrogate as lists.
+The data.table has to be defined as the expample below.}
+
+\item{paramsCMAESR}{[\code{data.table::data.table()}]\cr
+A data.table containing the hyperparameters: sigma and lambda.\cr
+Default is [\code{data.table::data.table(NULL)}], which defines the default hyperparameters.}
+
+\item{paramsES}{[\code{data.table::data.table()}]\cr
+A data.table containing the hyperparameters: nu, mue, sigmaInit, nSigma, mutation, tau, stratReco and objReco.\cr
+Default is [\code{data.table::data.table(NULL)}], which defines the default hyperparameters.}
+
+\item{paramsDE}{[\code{data.table::data.table()}]\cr
+A data.table containing the hyperparameter: populationSize.\cr
+Default is [\code{data.table::data.table(NULL)}], which defines the default hyperparameters.}
+
+\item{paramsGE}{[\code{data.table::data.table()}]\cr
+A data.table containing the hyperparameter: populationSize.\cr
+Default is [\code{data.table::data.table(NULL)}], which defines the default hyperparameters.}
 
 \item{repls}{[\code{integer(1)}]\cr
 Define how often each configuration is replicated for the benchmark.\cr
 Default is ten.}
+
+\item{showInfo}{[\code{logical(1)}]\cr
+Should some information be shown in the plot? \cr
+Default is `TRUE`.}
 
 \item{ncpus}{[\code{numeric(1)}]\cr
 Define how many cpu cores are used for the benchmark.\cr
@@ -36,12 +63,42 @@ Which means the jobs get the seed plus the job.id as their unique seed. \cr
 Default is one.}
 }
 \value{
-A plot containing one boxplot curve for each configurations benchmarked.
+A plot containing one boxplot for each algorithm.
 }
 \description{
-This functions benchmarks the optimization algorithms and
-then plots them as boxplots.
+This functions benchmarks the optimization algorithms: iRace, spotES, spotDE, spotGE, random, cmaesr and
+mlrMBO and then plots them as boxplots.
 }
-\references{
-Bernd Bischl, Jakob Richter, Jakob Bossek, Daniel Horn, Janek Thomas and Michel Lang; mlrMBO: A Modular Framework for Model-Based Optimization of Expensive Black-Box Functions, Preprint: \code{\link{https://arxiv.org/abs/1703.03373}} (2017).
+\examples{
+\dontrun{
+  set.seed(1)
+data <- data.frame(a = runif(50,10,5555), b = runif(50,-30000,-500),
+                  c = runif(50,0,1000),
+                  d = sample(c("nitrogen","air","argon"), 50, replace = TRUE),
+                  e = sample(c("cat1","cat2","cat3"), 50, replace = TRUE))
+data$ratio <- rowSums(data[,1:3]^2)
+data$ratio <- data$ratio/max(data$ratio)
+colnames(data) <- c("power", "time", "pressure", "gas", "cat","testTarget")
+instance = mlr::train(mlr::makeLearner("regr.randomForest"), mlr::makeRegrTask(data = data, target = "testTarget"))
+
+psOpt = ParamHelpers::makeParamSet(
+  ParamHelpers::makeIntegerParam("power", lower = 10, upper = 5555),
+  ParamHelpers::makeIntegerParam("time", lower = -30000, upper = -500),
+  ParamHelpers::makeNumericParam("pressure", lower = 0, upper = 1000),
+  ParamHelpers::makeDiscreteParam("gas", values = c("nitrogen", "air", "argon")),
+  ParamHelpers::makeDiscreteParam("cat", values = c("cat1","cat2","cat3"))
+)
+
+funcEvals = 60
+
+task = task(
+  simulation = "regr.randomForest",
+  data = data,
+  target = "testTarget",
+  psOpt = psOpt,
+  minimize = FALSE
+)
+plotBenchmark2 = plotBenchmark(task, funcEvals, repls = 2, seed = 1)
+}
+
 }

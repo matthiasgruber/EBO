@@ -155,7 +155,7 @@ generateConfigdata = function(task, funcEvals = 50, paramsMBO = NULL,
   }
   # features from parameter space must be identical with features from data
   numberFeatures = ncol(task[[4]])-1
-  if ((names(task[[6]][["pars"]][1:numberFeatures]) == names(task[[4]][1:numberFeatures]))==FALSE) {
+  if (isFALSE(names(task[[6]][["pars"]][1:numberFeatures]) == names(task[[4]][1:numberFeatures]))) {
     stop("data variables must be identical with ParamSet variables!")
   }
 
@@ -178,7 +178,7 @@ generateConfigdata = function(task, funcEvals = 50, paramsMBO = NULL,
   checkmate::assertClass(paramsMBO, classes = c("data.table", "data.frame"))
 
   # namesBoxplot must be array with characters, length must be identical with paramsMBO
-  assertCharacter(namesBoxplot, len = nrow(paramsMBO), unique = TRUE, any.missing = FALSE, all.missing = FALSE)
+  checkmate::assertCharacter(namesBoxplot, len = nrow(paramsMBO), unique = TRUE, any.missing = FALSE, all.missing = FALSE)
 
   if (length(namesBoxplot) != nrow(paramsMBO)) {
     stop("namesBoxplot must have same length as paramsMBO")

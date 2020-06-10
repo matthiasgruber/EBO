@@ -1,10 +1,10 @@
-computeGE = function(reg, objEncoded, configEs, repls) {
+computeGE = function(reg, objEncoded, configGE, repls) {
   addAlgorithm(name = "ge", fun = configGEFunc, reg = reg)
   # add Experiments to registry
   addExperiments(prob.designs = objEncoded, algo.designs = configGE, repls = repls, reg = reg)
 }
 
-configGEFunc = function(instance, funcEvals = 50, populationSize = NA, ...) {
+configGEFunc = function(instance, funcEvals = 50, populationSize = NULL, ...) {
 
   # wrapper in order to use SPOT optimization algorithms
   fun2 = function(xmat) {
@@ -15,10 +15,14 @@ configGEFunc = function(instance, funcEvals = 50, populationSize = NA, ...) {
 
   psOpt = getParamSet(instance[[1]])
 
+  seed = as.integer(runif(1, 1, 1000))
+
+  set.seed(seed)
+
   res <- SPOT::optimGenoud(fun = fun2, lower = getLower(psOpt), upper = getUpper(psOpt),
                            control = list(funEvals = funcEvals,
                                           populationSize = ifelse(!is.null(populationSize), populationSize <- populationSize, populationSize <- 10*instance[[2]]$featureNumber),
-                                          seed = NULL))
+                                          seed = seed))
 
   y = as.data.frame(res[["ybest"]])
   x = as.data.frame(res[["xbest"]])
