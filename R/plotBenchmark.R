@@ -62,6 +62,7 @@ plotBenchmark = function(task, funcEvals = 65, paramsMBO = data.table::data.tabl
                          paramsDE = data.table::data.table(NULL), paramsGE = data.table::data.table(NULL),
                          repls = 25, showInfo = TRUE, ncpus = NA, seed = 5) {
 
+  EBO::assertTask(task)
   EBO::assertReplsNcpusSeed(repls, ncpus, seed)
   checkmate::assertLogical(showInfo, len = 1, any.missing = FALSE)
   checkmate::assertIntegerish(funcEvals, lower = 56, any.missing = TRUE,

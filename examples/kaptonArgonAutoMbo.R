@@ -1,5 +1,5 @@
 # get the data
-kapton = openxlsx::read.xlsx("tests/testthat/data/kaptonArgon.xlsx")
+kapton = openxlsx::read.xlsx("examples/data/kaptonArgon.xlsx")
 
 # define the target
 target = c("ratio")

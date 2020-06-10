@@ -69,6 +69,7 @@
 plotMboHyperparams = function(task, funcEvals, psParamPlot, resolution,
                               repls, showInfo = TRUE, ncpus = NA, seed = 1) {
 
+  EBO::assertTask(task)
   EBO::assertReplsNcpusSeed(repls, ncpus, seed)
   checkmate::assertLogical(showInfo, len = 1, any.missing = FALSE)
   checkmate::assertIntegerish(funcEvals, lower = 1, any.missing = TRUE,

@@ -1,5 +1,5 @@
 # get the data
-synthesis = openxlsx::read.xlsx("tests/testthat/data/synthesis.xlsx")
+synthesis = openxlsx::read.xlsx("examples/data/synthesis.xlsx")
 
 # define the target
 target = c("interface")

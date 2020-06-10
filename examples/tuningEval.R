@@ -1,4 +1,4 @@
-grapheneArgon = as.data.frame(readxl::read_excel("data/grapheneArgon.xlsx"))
+grapheneArgon = as.data.frame(readxl::read_excel("examples/data/grapheneArgon.xlsx"))
 
 # define parameter spce
 psOpt = makeParamSet(
@@ -55,7 +55,7 @@ eval1 = EBO::boxplotCurve(kaptConfigResults)
 
 
 
-kapton = as.data.frame(readxl::read_excel("data/kaptonArgon.xlsx"))
+kapton = as.data.frame(readxl::read_excel("examples/data/kaptonArgon.xlsx"))
 
 # define parameter spce
 psOpt = makeParamSet(
@@ -109,7 +109,7 @@ eval1 = EBO::boxplotCurve(kaptConfigResults)
 
 
 
-synthesis = openxlsx::read.xlsx("data/synthesis.xlsx")
+synthesis = openxlsx::read.xlsx("examples/data/synthesis.xlsx")
 
 # define parameter spce
 

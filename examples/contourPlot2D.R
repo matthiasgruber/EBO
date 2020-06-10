@@ -1,4 +1,4 @@
-synthesis = as.data.frame(readxl::read_excel("tests/testthat/data/synthesis.xlsx"))
+synthesis = as.data.frame(readxl::read_excel("examples/data/synthesis.xlsx"))
 
 psOpt = ParamHelpers::makeParamSet(
   ParamHelpers::makeNumericParam("f", lower = 0, upper = 0.25),
@@ -31,7 +31,7 @@ plot1 = EBO::plotMboHyperparams(task, funcEvals, psParamPlot, resolution, repls 
 
 
 
-kapton = as.data.frame(readxl::read_excel("tests/testthat/data/kaptonArgon.xlsx"))
+kapton = as.data.frame(readxl::read_excel("examples/data/kaptonArgon.xlsx"))
 
 psOpt = ParamHelpers::makeParamSet(
   ParamHelpers::makeIntegerParam("power", lower = 10, upper = 5555),
