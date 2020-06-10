@@ -130,7 +130,7 @@ testConfigs = function(configResults) {
 
     testdata$class = ordered(testdata$class, levels = namesBoxplot)
 
-    wilcox.test(testdata$y_best ~ testdata$class, alternative = "two.sided", data = testdata, paired = FALSE)
+    test = wilcox.test(testdata$y_best ~ testdata$class, alternative = "two.sided", data = testdata, paired = FALSE)
 
 
     return(list(summary, plot(boxplot), test))
