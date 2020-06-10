@@ -1,3 +1,94 @@
+#' Generate instances for EBO::optimizertuneRace()
+#'
+#' This functions enables users to create an instance list with different problems, which are
+#' used for EBO::optimizertuneRace().
+#'
+#' @param psOpt [\code{ParamHelpers::ParamSet()}]\cr
+#'  Collection of parameters and their constraints for problem optimization
+#' @param simulation [\code{character}]\cr
+#'  The black box function e.g. model for the \code{mlrMBO}
+#'  Default is `regr.randomForest`.
+#' @param minimize [\code{logical(1)}]\cr
+#'  Should the target be minimized? \cr
+#'  Default is `TRUE`.
+#' @param data [\code{data.frame}]\cr
+#'  Data of problem. \cr
+#' @param target [\code{character}]\cr
+#'  The variable, which one wants to minimize (maximize) \code{mlrMBO}.
+#' @param task [\code{EBO:: task()}]\cr
+#'  Task defines the problem setting.
+#' @param generateProblemList [\code{EBO::generateProblemList()}]\cr
+#'  Define list with instances e.g. tasks, which are used for tuning. Several tasks can be passed
+#'  to EBO::generateProblemList().\cr
+#'
+#' @return List of instances with different problems / tasks.
+#'
+#' @examples
+#' \dontrun{
+#' set.seed(1)
+#'
+#' library(mlrMBO)
+#' library(ParamHelpers)
+#' library(mlr)
+#'
+#' set.seed(1)
+#'
+#' # define problem 1
+#' data1 <- data.frame(a = runif(50,10,5555), b = runif(50,-30000,-500),
+#'                    c = runif(50,0,1000))
+#' data1$ratio <- rowSums(data1[,1:3]^2)
+#' data1$ratio <- data1$ratio/max(data1$ratio)
+#' colnames(data1) <- c("power", "time", "pressure","ratio")
+#'
+#' psOpt = makeParamSet(
+#'
+#'  makeIntegerParam("power", lower = 10, upper = 5555),
+#'
+#'  makeIntegerParam("time", lower = -30000, upper = -500),
+#'
+#'  makeIntegerParam("pressure", lower = 0, upper = 1000)
+#')
+#'
+#' task1 = task(
+#'  simulation = "regr.randomForest",
+#'  data = data1,
+#'  target = "ratio",
+#'  psOpt = psOpt,
+#'  minimize = FALSE
+#' )
+#'
+#'
+#' # define problem 2
+#' data2 <- data.frame(a = runif(80,0,0.25), b = runif(80, 0,0.1),
+#'                    c = runif(80,0,1), d = runif(80,0,1))
+#' data2$interface <- rowSums((data2[,1:4]*8)^2)
+#' data2$interface <- data2$interface/max(data2$interface)
+#' colnames(data2) <- c("f", "k", "du","dv")
+#'
+#'
+#' psOpt = ParamHelpers::makeParamSet(
+#'  ParamHelpers::makeNumericParam("f", lower = 0, upper = 0.25),
+#'  ParamHelpers::makeNumericParam("k", lower = 0, upper = 0.1),
+#'  ParamHelpers::makeNumericParam("du", lower = 0, upper = 1),
+#'  ParamHelpers::makeNumericParam("dv", lower = 0, upper = 1)
+#' )
+#'
+#' task2 = task(
+#'  simulation = "regr.randomForest",
+#'  data = data2,
+#'  target = "interface",
+#'  psOpt = psOpt,
+#'  minimize = FALSE
+#' )
+#'
+#'
+#' ################## Define problemList #############
+#'
+#' problemList = generateProblemList(task1, task2)
+#' }
+
+
+
 generateProblemList = function(...) {
 
   taskList = list(...)
@@ -51,8 +142,10 @@ generateProblemList = function(...) {
     }
     # features from parameter space must be identical with features from data
     numberFeatures = ncol(taskList[[i]][[4]])-1
-    if ((names(taskList[[i]][[6]][["pars"]][1:numberFeatures]) == names(taskList[[i]][[4]][1:numberFeatures]))==FALSE) {
-      stop("data variables must be identical with ParamSet variables!")
+    for(r in 1:numberFeatures) {
+      if (isFALSE(names(taskList[[i]][[6]][["pars"]][r]) %in% names(taskList[[i]][[4]][1:numberFeatures]))) {
+        stop("data variables must be identical with ParamSet variables!")
+      }
     }
 
     # assertions for target
@@ -66,14 +159,6 @@ generateProblemList = function(...) {
     if((taskList[[i]][[7]] %in% names(taskList[[i]][[4]]))== FALSE) {
       stop("target from task must exist in data!")
     }
-
-    #checkmate::assertNames(taskList[[i]][2], identical.to = c("p"))
-    #checkmate::assertNames(taskList[[i]][3], identical.to = c("minimize"))
-    #checkmate::assertNames(taskList[[i]][4], identical.to = c("data"))
-    #checkmate::assertNames(taskList[[i]][5], identical.to = c("simulation"))
-    #checkmate::assertNames(taskList[[i]][6], identical.to = c("psOpt"))
-    #checkmate::assertNames(taskList[[i]][7], identical.to = c("target"))
-    #check if correct class of listelements
   }
 
 

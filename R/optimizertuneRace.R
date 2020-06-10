@@ -1,7 +1,6 @@
-#' plot boxplot curves of \code{mlrMBO::mbo()} optimization runs
+#' Tuning of optimization algorithms
 #'
-#' This functions benchmarks the \code{mlrMBO::mbo()} function on different configuration and
-#' then plots them as boxplots wrt to their iterations.
+#' This functions enables users to tune the hyperparameters of different optimization algorithms.
 #'
 #' @param psOpt [\code{ParamHelpers::ParamSet()}]\cr
 #'  Collection of parameters and their constraints for problem optimization
@@ -15,24 +14,24 @@
 #'  Task defines the problem setting.
 #' @param generateProblemList [\code{EBO::generateProblemList()}]\cr
 #'  Define list with instances e.g. tasks, which are used for tuning.\cr
-#' @param traininstanceList [\code{EBO:: task()}]\cr
-#'  Define list with instances, which are used for tuning.\cr
+#' @param traininstanceList [\code{list()}]\cr
+#'  Define list with instances / problems, which were defined with EBO::generateProblemList().\cr
 #' @param funcEvals [\code{integer(1)}]\cr
 #'  Define the number of function evaluations.\cr
 #'  Default is 50.
 #' @param optimizer [\code{character}]\cr
 #'  optimization algorithm which user want to tune \cr
 #'  possible optimization algorithms are: "optimizeMBO", "optimizeES", "optimizeDE",
-#'  "optimizeGenoud", "optimizeCmaesr"\cr
+#'  "optimizeGenoud", "optimizeCmaesr"
 #'  Default is `NA`.
-#' @param plotAblation [\code{logical(1)}]\cr
+#'  @param plotAblation [\code{logical(1)}]\cr
 #'  Should an ablation analysis be run with the tuning Result? \cr
 #'  Default is `FALSE`.
-#' @param ablationFile [\code{character}]\cr
+#'  @param ablationFile [\code{character}]\cr
 #'  Saving path for the ablation analysis. \cr
 #'  Default is `NA`.
-#' @param configurationFile [\code{character}]\cr
-#'  Use a txt file to define the source for ablation analysis \cr
+#'  @param configurationFile [\code{character}]\cr
+#'  Use a .txt file to define the source for ablation analysis \cr
 #'  We recommend using the default algorithm setting.
 #'  Default is `NA`.
 #' @param seed [\code{numeric(1)}]\cr
@@ -41,39 +40,41 @@
 #' @param psTune [\code{ParamHelpers::ParamSet()}]\cr
 #'  Collection of hyperparameters and their constraints for the tuning, e.g. tuning of optimizer
 #'  In the following, the hyperparamter of the optimizer, which one can tune are summarized.
-#'  "optimizeMBO":\cr
-#'     - design[string]: "maximinLHS", "randomLHS", "random", "optimLHS"\cr
-#'     - surrogate[string]: "regr.randomForest", "regr.km"\cr
-#'     - covtype[string]: "matern5_2","matern3_2", "powexp", "gauss"\cr
-#'     - crit[string]: "makeMBOInfillCritAEI","makeMBOInfillCritCB", "makeMBOInfillCritAdaCB","makeMBOInfillCritEI"\cr
-#'     - cb.lambda[numeric]: defines cb.lambda from makeMBOInfillCritCB; default is 1\cr
-#'     - cb.lambda.start[numeric]: defines cb.lambda.start from makeMBOInfillCritAdaCB; default is ...\cr
-#'     - cb.lambda.end[numeric]:  defines cb.lambda.end from makeMBOInfillCritAdaCB; default is ...\cr
-#'  "optimizeES":\cr
+#'  "optimizeMBO":
+#'     - design[string]: "maximinLHS", "randomLHS", "random", "optimumLHS", "augmentLHS",
+#'                       "geneticLHS", "improvedLHS", "optAugmentLHS"
+#'     - surrogate[string]: "regr.randomForest", "regr.km"
+#'     - amount[integer]: defines number of initial design points. default is number of features + 1.
+#'     - covtype[string]: "matern5_2","matern3_2", "powexp", "gauss"
+#'     - nodesize[integer]: default is ...
+#'     - mtry[integer]: default is ...
+#'     - crit[string]: "makeMBOInfillCritAEI","makeMBOInfillCritCB", "makeMBOInfillCritAdaCB","makeMBOInfillCritEI", "makeMBOInfillCritDIB",
+#'                     "makeMBOInfillCritEQI", "makeMBOInfillCritMeanResponse", "makeMBOInfillCritStandardError"
+#'     - cb.lambda[numeric]: defines cb.lambda from makeMBOInfillCritCB; default is 1 for fully numeric parameter set and 2 otherwise
+#'     - cb.lambda.start[numeric]: defines cb.lambda.start from makeMBOInfillCritAdaCB
+#'     - cb.lambda.end[numeric]:  defines cb.lambda.end from makeMBOInfillCritAdaCB
+#'     - eqi.beta[numeric]: Beta parameter for expected quantile improvement criterion. Default is 0.75.
+#'  "optimizeES":
 #'     - nu[integer]: selection pressure. That means, number of offspring (lambda) is
-#'           mue multiplied with nu. Default is 10\cr
-#'     - mue[integer]: number of parents, default is 10\cr
-#'     - sigmaInit[numeric]: initial sigma value (step size), default is 1.0\cr
-#'     - nSigma[integer]: number of different sigmas, default is 1\cr
-#'     - mutation[integer]: string of mutation type, default is 1\cr
+#'           mue multiplied with nu. Default is 10
+#'     - mue[integer]: number of parents, default is 10
+#'     - sigmaInit[numeric]: initial sigma value (step size), default is 1.0
+#'     - nSigma[integer]: number of different sigmas, default is 1
+#'     - mutation[integer]: string of mutation type, default is 1
 #'     - tau[numeric]: number, learning parameter for self adaption,
-#'            i.e. the local multiplier for step sizes (for each dimension).default is 1.0\cr
+#'            i.e. the local multiplier for step sizes (for each dimension).default is 1.0
 #'     - stratReco[integer]: Recombination operator for strategy variables. 1: none.
 #'                  2: dominant/discrete (default). 3: intermediate.
-#'                  4: variation of intermediate recombination.\cr
+#'                  4: variation of intermediate recombination.
 #'     - objReco[integer]: Recombination operator for object variables. 1: none. 2: dominant/discrete (default).
-#'                3: intermediate. 4: variation of intermediate recombination.\cr
-#'  "optimizeGenoud":\cr
-#'     - populationSize[integer]: Number of individuals in the population. Default is 10*dimension.\cr
-#'  "optimizeDE":\cr
-#'     - populationSize[integer]: Number of particles in the population. Default is 10*dimension.\cr
-#'  "optimizeCmaesr":\cr
-#'     - sigma[numeric(1)]: Initial step-size. Default is 0.5.\cr
-#'     - lambda[integer(1)]: Number of offspring generated in each generation.\cr
-#'
-#'
-#'
-#'
+#'                3: intermediate. 4: variation of intermediate recombination.
+#'  "optimizeGenoud":
+#'     - populationSize[integer]: Number of individuals in the population. Default is 10*dimension.
+#'  "optimizeDE":
+#'     - populationSize[integer]: Number of particles in the population. Default is 10*dimension.
+#'  "optimizeCmaesr":
+#'     - sigma[numeric(1)]: Initial step-size. Default is 0.5.
+#'     - lambda[integer(1)]: Number of offspring generated in each generation.
 #'
 #' @param itersTune [\code{integer(1)}]\cr
 #'   Define the tuning budget used for tuning with \code{irace}
@@ -86,10 +87,11 @@
 #'  Default is `F-test`.
 #'
 #'
-#' @return A plot containing one boxplot curve for each configurations benchmarked.
+#' @return Elite configurations for defined tasks and an ablation analysis if plotAblation = TRUE.
 #'
 #' @references [\code{mlrMBO::mbo()}]
-#' @references Bernd Bischl, Jakob Richter, Jakob Bossek, Daniel Horn, Janek Thomas and Michel Lang; mlrMBO: A Modular Framework for Model-Based Optimization of Expensive Black-Box Functions, Preprint: \code{\link{https://arxiv.org/abs/1703.03373}} (2017).
+#' @references Manuel López-Ibànez, Leslie Pérez Cáceres, Jérémie Dubois-Lacoste, Thomas Stützle and Mauro Birattari, The irace Package:
+#' User Guide. Preprint: \code{\link{https://cran.r-project.org/web/packages/irace/vignettes/irace-package.pdf}} (2019).
 #'
 #' @export
 #'
@@ -154,11 +156,10 @@
 #'  minimize = FALSE
 #' )
 #'
-#' taskList = list(task1, task2)
 #'
 #' ################## Define problemList #############
 #'
-#' problemList = generateProblemList(taskList)
+#' problemList = generateProblemList(task1, task2)
 #'
 #'
 #' ### tune SMBO algorithm
@@ -237,14 +238,49 @@ optimizertuneRace = function(optimizer,
   #itersTune assertions works within the iRace package
 
   # assertion on psTune
-  if (optimizer == "optimizeMBO") {assertPsTuneMBO(psTune)}
+  if (optimizer == "optimizeMBO") {EBO::assertPsTuneMBO(psTune)}
 
-  if (optimizer == "optimizeES") {assertPsTuneES(psTune)}
+  if (optimizer == "optimizeES") {EBO::assertPsTuneES(psTune)}
 
-  if (optimizer == "optimizeGenoud"| optimizer == "optimizeDE") {assertPsTuneDE_GENOUD(psTune)}
+  if (optimizer == "optimizeGenoud"| optimizer == "optimizeDE") {
+    checkmate::assertChoice(names(psTune$pars), c("populationSize"))
+    if (getParamNr(psTune) == 0L) {
+      stop("No hyperparameters were passed!")
+    }
 
-  if (optimizer == "optimizeCmaesr") {assertPsTuneDE_GENOUD(psTune)}
+    # check if populationSize is passed correctly
+    if (!is.null(psTune[["pars"]]$populationSize)) {
+      # check if populationSize is passed as integer
+      if (!psTune[["pars"]]$populationSize$type == "integer") {
+        stop("Tuning populationSize only works if it is passed as a integer parameter!")
+      }
+    }
+  }
 
+  if (optimizer == "optimizeCmaesr") {
+    name = names(psTune$pars)
+    for (i in 1:length(name)) {
+      checkmate::assertChoice(name[i], c("lambda", "sigma"))
+    }
+    if (getParamNr(psTune) == 0L) {
+      stop("No hyperparameters were passed!")
+    }
+
+    # check if lambda is passed correctly
+    if (!is.null(psTune[["pars"]]$lambda)) {
+      # check if lambda is passed as integer
+      if (!psTune[["pars"]]$lambda$type == "integer") {
+        stop("Tuning lambda only works if it is passed as a integer parameter!")
+      }
+    }
+    # check if sigma is passed correctly
+    if (!is.null(psTune[["pars"]]$sigma)) {
+      # check if sigma is passed as numeric
+      if (!psTune[["pars"]]$sigma$type == "numeric") {
+        stop("Tuning sigma only works if it is passed as a numeric parameter!")
+      }
+    }
+  }
 
   checkmate::assertClass(trainInstanceList, classes = c("list"))
 
@@ -269,7 +305,7 @@ optimizertuneRace = function(optimizer,
     }
 
     # assertions for parameter space
-    if (names(problemList[[i]][[2]]) != "psOpt") {
+    if (names(problemList[[i]][2]) != "psOpt") {
       stop("problemList must contain parameter space psOpt!")
     }
     if (class(problemList[[i]][[2]]) != "ParamSet") {
@@ -277,19 +313,21 @@ optimizertuneRace = function(optimizer,
     }
     # features from parameter space must be identical with features from data
     numberFeatures = ncol(problemList[[i]][[1]])-1
-    if ((names(problemList[[i]][[2]][["pars"]][1:numberFeatures]) == names(problemList[[i]][[1]][1:numberFeatures]))==FALSE) {
-      stop("data features must be identical with psOpt features!")
+    for(r in 1:numberFeatures) {
+      if (isFALSE(names(problemList[[i]][[2]][["pars"]][["pars"]][r]) %in% names(problemList[[i]][[1]][1:numberFeatures]))) {
+        stop("data features must be identical with psOpt features!")
+      }
     }
 
     # assertions for target
-    if (names(problemList[[i]][[3]]) != "target") {
+    if (names(problemList[[i]][3]) != "target") {
       stop("problemList must contain target!")
     }
     if (class(problemList[[i]][[3]]) != "character") {
       stop("target in problemList must be character!")
     }
     # targets from tasks must exist in data
-    if((problemList[[i]][[3]] %in% names(problemList[[i]][[1]]))== FALSE) {
+    if(isFALSE(problemList[[i]][[3]] %in% names(problemList[[i]][[1]]))) {
       stop("target must be identical with target in data!")
     }
     # assertion for simulation
@@ -338,44 +376,47 @@ optimizertuneRace = function(optimizer,
   checkmate::assertIntegerish(seed, lower = 1, any.missing = FALSE,
                               len = 1)
 
-
-
-
   # transform into irace parameter set
-  psTune <- ParamHelpers::convertParamSetToIrace(psTune)
+  psTune = ParamHelpers::convertParamSetToIrace(psTune)
 
+
+  # define target.runner of iRace
   target.runner = function(experiment, scenario) {
+
     debugLevel    = scenario$debugLevel
+
     configuration.id  = experiment$id.configuration
+
     instance.id   = experiment$id.instance
+
     seed          = experiment$seed
+
     configuration = experiment$configuration
 
     set.seed(seed)
 
     instance = experiment$instance
 
+    # define trainInstanceList as iRace instances
     trainInstanceList = instance
 
+    # build model for each instance (based on the informations of trainInstanceList)
     model = mlr::train(mlr::makeLearner(instance$simulation), mlr::makeRegrTask(data = instance$data, target = instance$target))
 
     info = getModelInfo(model, instance$psOpt, minimize = minimize)
 
+    # different tuning algorithms, with different objective functions
     if (optimizer == "optimizeCmaesr") {
 
       objEncoded = objEncodedFunc(model, instance$psOpt, info)
-      #objEncoded2 = objEncodedFunc(model2, task2$psOpt2, info2)
 
       res = do.call(optimizer, list(configuration, objEncoded[[1]], info, funcEvals))
-
-      #res = do.call(optimizer, list(configuration, objEncoded2[[1]], info2, funcEvals))
 
     }
 
     if (optimizer == "optimizeES" | optimizer == "optimizeGenoud"| optimizer == "optimizeDE") {
 
       objEncoded = objSPOTFunc(model, instance$psOpt, info)
-      #objEncoded2 = objEncodedFunc(model2, task2$psOpt2, info2)
 
       res = do.call(optimizer, list(configuration, objEncoded[[1]], info, funcEvals))
     }
@@ -390,23 +431,26 @@ optimizertuneRace = function(optimizer,
 
     # get best y of the optimizer run (all optimizers return the same result!)
     y = as.numeric(res[[1]][info$y.name])
-    #y = as.numeric(res[[1]][[1]][,info$y.name])
 
+    # multiply with p, to allow maximization
     result = list(cost = (info$p)*y, call = toString(experiment))
 
     return(result)
   }
-  ########### Run-Function / Irace Options / Configuration Scenario ########
+  ########### Configuration Scenario ########
 
   scenario                = irace::defaultScenario()
 
   scenario$targetRunner   = "target.runner"
 
+  # start the iRace procedure with specified configurations
+  # we highly recommend to specify the default setting as configurationFile, to define the
+  # source of the ablation analysis
   scenario$configurationsFile = configurationsFile
 
-  # define tuning iterations
+  # define tuning budget
   scenario$maxExperiments = itersTune
-  # define trainInstances
+
   scenario$instances      = trainInstanceList
 
   # parallelisation
@@ -417,6 +461,7 @@ optimizertuneRace = function(optimizer,
   #define test type
   scenario$testType = test
 
+  # define how many instances are evaluated, before first test
   scenario$firstTest = firstTest
 
   scenario$seed = seed
@@ -425,12 +470,14 @@ optimizertuneRace = function(optimizer,
 
   load("irace.Rdata")
 
+  # run ablation analysis
   if(plotAblation == TRUE) {
 
     ablation(iraceResults = iraceResults , pdf.file = ablationFile)
 
     load("log-ablation.Rdata")
 
+    # convert to maximization problem
     ab.log[["experiments"]] = ab.log[["experiments"]]*(ifelse(minimize == TRUE, (1), (-1)))
 
     ablation = plotAblation(ab.log, pdf.file = ablationFile)

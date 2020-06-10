@@ -1,5 +1,5 @@
 computeEs = function(reg, objEncoded, configEs, repls) {
-  addAlgorithm(name = "SpotES", fun = configESFunc, reg = reg)
+  addAlgorithm(name = "es", fun = configESFunc, reg = reg)
   # add Experiments to registry
   addExperiments(prob.designs = objEncoded, algo.designs = configEs, repls = repls, reg = reg)
 }
@@ -7,11 +7,10 @@ computeEs = function(reg, objEncoded, configEs, repls) {
 configESFunc = function(instance, funcEvals = 50, nu = 10, mue = 10, sigmaInit = 1.0, nSigma = 1,
                         mutation = 1, tau = 1.0, stratReco = 2, objReco = 2, ...) {
 
+  # wrapper in order to use SPOT optimization algorithms
   fun2 = function(xmat) {
     apply(xmat, 1, instance[[1]])
   }
-
-  seed = as.integer(runif(1, 1, 1000))
 
   # define optimizer / algo
 
@@ -20,14 +19,13 @@ configESFunc = function(instance, funcEvals = 50, nu = 10, mue = 10, sigmaInit =
   res <- SPOT::optimES(fun = fun2, lower = getLower(psOpt), upper = getUpper(psOpt),
                  control = list(funEvals = funcEvals, nu = nu, mue = mue, sigmaInit = sigmaInit,
                                 nSigma = nSigma, mutation = mutation, tau = tau,
-                                stratReco = stratReco, objReco = objReco, seed = seed))
+                                stratReco = stratReco, objReco = objReco))
 
   y = as.data.frame(res[["ybest"]])
   x = as.data.frame(res[["xbest"]])
 
+  # data transformations in the case of discrete variables
   for (i in 1:instance[[2]]$featureNumber) {
-
-    #if (instance[[2]]$featureType[i] == "integer") x[i] = as.integer(round(x[i]))
 
     if (instance[[2]]$featureType[i] == "discrete") {
       x[i] = round(x[i])

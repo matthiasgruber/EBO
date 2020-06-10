@@ -1,11 +1,11 @@
 optimizeDE = function(configuration, objSPOTFunc, info, funcEvals) {
 
+  # compute DE and define Hyperparameters
 
   res = configDEFunc(instance = list(objSPOTFunc, info),
                      funcEvals = funcEvals,
-                     #define Hyperparameters of Genoud Algrotihm
+                     #define Hyperparameters of DE Algrotihm
                      populationSize =  configuration$populationSize#
-
 
   )
 

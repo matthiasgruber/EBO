@@ -1,33 +1,31 @@
-computeGe = function(reg, objEncoded, configGe, repls) {
-  addAlgorithm(name = "SpotGE", fun = configGEFunc, reg = reg)
+computeGE = function(reg, objEncoded, configEs, repls) {
+  addAlgorithm(name = "ge", fun = configGEFunc, reg = reg)
   # add Experiments to registry
-  addExperiments(prob.designs = objEncoded, algo.designs = configGe, repls = repls, reg = reg)
+  addExperiments(prob.designs = objEncoded, algo.designs = configGE, repls = repls, reg = reg)
 }
 
-configGEFunc = function(instance, funcEvals = 50, populationSize = NULL, ...) {
+configGEFunc = function(instance, funcEvals = 50, populationSize = NA, ...) {
 
+  # wrapper in order to use SPOT optimization algorithms
   fun2 = function(xmat) {
     apply(xmat, 1, instance[[1]])
   }
 
   # define optimizer / algo
-  seed = as.integer(runif(1, 1, 1000))
-
-  set.seed(seed)
 
   psOpt = getParamSet(instance[[1]])
 
   res <- SPOT::optimGenoud(fun = fun2, lower = getLower(psOpt), upper = getUpper(psOpt),
                            control = list(funEvals = funcEvals,
                                           populationSize = ifelse(!is.null(populationSize), populationSize <- populationSize, populationSize <- 10*instance[[2]]$featureNumber),
-                                          seed = seed))
+                                          seed = NULL))
 
   y = as.data.frame(res[["ybest"]])
   x = as.data.frame(res[["xbest"]])
 
-  for (i in 1:instance[[2]]$featureNumber) {
+  # data transformations in the case of discrete variables
 
-    #if (instance[[2]]$featureType[i] == "integer") x[i] = as.integer(round(x[i]))
+  for (i in 1:instance[[2]]$featureNumber) {
 
     if (instance[[2]]$featureType[i] == "discrete") {
       x[i] = round(x[i])

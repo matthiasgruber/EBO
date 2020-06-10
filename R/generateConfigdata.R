@@ -1,24 +1,22 @@
-#' plot boxplot curves of \code{mlrMBO::mbo()} optimization runs
+#' Generate benchmark data of \code{mlrMBO::mbo()} optimization runs
 #'
-#' This functions benchmarks the \code{mlrMBO::mbo()} function on different configuration and
-#' then plots them as boxplots wrt to their iterations.
+#' This function benchmarks the \code{mlrMBO::mbo()} function on different configurations. The
+#' resulting data can be used for several EBO functions such as EBO::boxplotCurve(), EBO::testAddIters(),
+#' EBO::testConfigs().
 #'
-#' @param model [\code{wrapped model}]\cr
-#'       A trained model.
-#' @param psOpt [\code{ParamHelpers::ParamSet()}]\cr
-#'   Collection of parameters and their constraints for optimization.
+#'
 #' @param paramsMBO [\code{data.table::data.table()}]\cr
-#'   A data.table containing itersMbo, design, amountDesign, control and surrogate as lists.
+#'   A data.table containing design, amountDesign, control and surrogate as lists.
 #'   The data.table has to be defined as the expample below.
-#' @param minimize [\code{logical(1)}]\cr
-#'   Should the target be minimized? \cr
-#'   Default is `TRUE`.
 #' @param namesBoxplotCurve [\code{character}]\cr
 #'   The names for the \code{mlrMBO} configurations
 #'   Default is `default`.
 #' @param repls [\code{integer(1)}]\cr
-#'  Define how often each configuration is replicated for the benchmark.\cr
-#'  Default is ten.
+#'  Define how often each configuration is run for the benchmark.\cr
+#'  Default is 20
+#' @param funcEvals [\code{integer(1)}]\cr
+#'  Define the number of function evaluations.\cr
+#'  Default is 50.
 #' @param showInfo [\code{logical(1)}]\cr
 #'   Should some information be shown in the plot? \cr
 #'   Default is `TRUE`.
@@ -29,10 +27,20 @@
 #'  Define the seed used for the computation. Will be set by \code{batchtools}.
 #'  Which means the jobs get the seed plus the job.id as their unique seed. \cr
 #'  Default is one.
+#' @param psOpt [\code{ParamHelpers::ParamSet()}]\cr
+#'  Collection of parameters and their constraints for optimization.
+#' @param simulation [\code{character}]\cr
+#'  The black box function e.g. model for the \code{mlrMBO}
+#'  Default is `regr.randomForest`.
+#' @param minimize [\code{logical(1)}]\cr
+#'  Should the target be minimized? \cr
+#'  Default is `TRUE`.
+#' @param task [\code{EBO:: task()}]\cr
+#'  Task defines the problem setting.
 #'
 #'
 #'
-#' @return A plot containing one boxplot curve for each configurations benchmarked.
+#' @return Benchmark data for each configuration.
 #'
 #' @references [\code{mlrMBO::mbo()}]
 #' @references Bernd Bischl, Jakob Richter, Jakob Bossek, Daniel Horn, Janek Thomas and Michel Lang; mlrMBO: A Modular Framework for Model-Based Optimization of Expensive Black-Box Functions, Preprint: \code{\link{https://arxiv.org/abs/1703.03373}} (2017).
@@ -43,91 +51,159 @@
 #'
 #' @examples
 #' \dontrun{
-#'   set.seed(1)
+#'
+#' set.seed(1)
+#'
+#' library(mlrMBO)
+#' library(ParamHelpers)
+#' library(mlr)
+#'
+#' # define infillCrit
+#' ctrl = mlrMBO::makeMBOControl()
+#' ctrl = mlrMBO::setMBOControlInfill(ctrl, crit = mlrMBO::makeMBOInfillCritEI())
+#'
+#' # define MBO configuration
+#' paramsMBO = data.table::data.table(
+#'  design = list("maximinLHS","randomLHS", "random"),
+#'  amountDesign = list(12),
+#'  control = list(ctrl),
+#'  surrogate = list(mlr::makeLearner("regr.km", predict.type = "se"))
+#' )
+#'
+#' namesBoxplot = c("maximinLHS",
+#'                 "randomLHS",
+#'                 "random")
+#'
+#' # define runs of each algorithm
+#' repls = 10
+#'
+#' # define function evaluations
+#' funcEvals = 32
+#'
+#'
 #' data <- data.frame(a = runif(50,10,5555), b = runif(50,-30000,-500),
-#'                    c = runif(50,0,1000),
-#'                    d = sample(c("nitrogen","air","argon"), 50, replace = TRUE),
-#'                    e = sample(c("cat1","cat2","cat3"), 50, replace = TRUE))
+#'                    c = runif(50,0,1000))
 #' data$ratio <- rowSums(data[,1:3]^2)
 #' data$ratio <- data$ratio/max(data$ratio)
-#' colnames(data) <- c("power", "time", "pressure", "gas", "cat","ratio")
-#' model = mlr::train(mlr::makeLearner("regr.randomForest"), mlr::makeRegrTask(data = data, target = "ratio"))
+#' colnames(data) <- c("power", "time", "pressure","ratio")
+#'
 #'
 #' psOpt = ParamHelpers::makeParamSet(
 #'   ParamHelpers::makeIntegerParam("power", lower = 10, upper = 5555),
 #'   ParamHelpers::makeIntegerParam("time", lower = -30000, upper = -500),
 #'   ParamHelpers::makeNumericParam("pressure", lower = 0, upper = 1000),
-#'   ParamHelpers::makeDiscreteParam("gas", values = c("nitrogen", "air", "argon")),
-#'   ParamHelpers::makeDiscreteParam("cat", values = c("cat1","cat2","cat3"))
 #' )
 #'
-#' task = (
-#' simulation = "regr.randomForest",
-#' target = "target",
-#' psOpt = psOpt,
-#' minimize = FALSE
+#' task = task(
+#'  simulation = "regr.randomForest",
+#'  data = data,
+#'  target = "ratio",
+#'  psOpt = psOpt,
+#'  minimize = FALSE
 #' )
 #'
-#' ctrl1 = mlrMBO::makeMBOControl()
-#' ctrl1 = mlrMBO::setMBOControlInfill(ctrl1, crit = mlrMBO::makeMBOInfillCritAEI())
-#' ctrl2 = mlrMBO::makeMBOControl()
-#' ctrl2 = mlrMBO::setMBOControlInfill(ctrl1, crit = mlrMBO::makeMBOInfillCritEI())
-#'
-#' paramsMBO = data.table::data.table(itersMbo = list(3),
-#'                                    design = list("maximinLHS"),
-#'                                    amountDesign = list(9,
-#'                                                        11),
-#'                                    control = list(ctrl1,
-#'                                                   ctrl2),
-#'                                    surrogate = list(mlr::makeLearner("regr.randomForest", predict.type = "se"))
-#' )
-#'
-#' namesBoxplot = c("Augmentet Expected Improvement + RandomForest + maximinLHS with amount = 9",
-#'                  "Expected Improvement + RandomForest + maximinLHS with amount = 11")
-#'
-#' configResults = generateConfigdata(task, funcEvals = 20, paramsMBO,
-#'                                namesBoxplot = namesBoxplot, repls = 5)
-#'
-#' boxplotCurve(configResults)
-#'
-#' configTest(configResults)
-#'
-#' addIterstest(configResults, baseIters = 10, addIters = 10, minimize = FALSE)
-#'
+#' # generate configData
+#' configResults = generateConfigdata(task, funcEvals = funcEvals, paramsMBO,
+#'                                        namesBoxplot = namesBoxplot, repls = repls)
 #' }
-generateConfigdata = function(task, funcEvals = NULL, paramsMBO = NULL,
+generateConfigdata = function(task, funcEvals = 50, paramsMBO = NULL,
                               namesBoxplot = c("default"),
-                              repls = 12, showInfo = TRUE, ncpus = NA, seed = 1) {
+                              repls = 20, showInfo = TRUE, ncpus = NA, seed = 1) {
+
+  if (class(task) != "list") {
+    stop("task must be a list!")
+  }
+  #check if correct number of elements
+  if (length(task) != "7") {
+    stop("task must have length 7!")
+  }
+  # check names and class of sublists
+  if (names(task[2]) != "p") {
+    stop("must pass p in task!")
+  }
+  if (class(task[[2]]) != "integer") {
+    stop("p must be integer!")
+  }
+
+  if (names(task[3]) != "minimize") {
+    stop("must pass minimize in task!")
+  }
+  if (class(task[[3]]) != "logical") {
+    stop("minimize must be logical!")
+  }
+
+  if (names(task[4]) != "data") {
+    stop("must pass data!")
+  }
+  if (class(task[[4]]) != "data.frame") {
+    stop("data must be data.frame!")
+  }
+
+  if (names(task[5]) != "simulation") {
+    stop("must pass simulation in task!")
+  }
+  if (class(task[[5]]) != "character") {
+    stop("simulation must be character!")
+  }
+
+  # assertions for parameter space
+  if (names(task[6]) != "psOpt") {
+    stop("must pass a paramHelpers object in task!")
+  }
+  if (class(task[[6]]) != "ParamSet") {
+    stop("parameter space must be a ParamSet object!")
+  }
+  # features from parameter space must be identical with features from data
+  numberFeatures = ncol(task[[4]])-1
+  if ((names(task[[6]][["pars"]][1:numberFeatures]) == names(task[[4]][1:numberFeatures]))==FALSE) {
+    stop("data variables must be identical with ParamSet variables!")
+  }
+
+  # assertions for target
+  if (names(task[7]) != "target") {
+    stop("must pass a target in task!")
+  }
+  if (class(task[[7]]) != "character") {
+    stop("target must be character!")
+  }
+  # targets from tasks must exist in data
+  if((task[[7]] %in% names(task[[4]]))== FALSE) {
+    stop("target from task must exist in data!")
+  }
+
+  EBO::assertReplsNcpusSeed(repls, ncpus, seed)
+
+  checkmate::assertLogical(showInfo, len = 1, any.missing = FALSE)
+
+  checkmate::assertClass(paramsMBO, classes = c("data.table", "data.frame"))
+
+  # namesBoxplot must be array with characters, length must be identical with paramsMBO
+  assertCharacter(namesBoxplot, len = nrow(paramsMBO), unique = TRUE, any.missing = FALSE, all.missing = FALSE)
+
+  if (length(namesBoxplot) != nrow(paramsMBO)) {
+    stop("namesBoxplot must have same length as paramsMBO")
+  }
+
+
   startTime <- Sys.time()
   set.seed(seed)
 
-  #numberInstances = length(instanceList)
-
-  #configDataFrame = vector(mode = "list", length = numberInstances)
-
-  #model = vector(mode = "list", length = numberInstances)
-
-  #for(r in 1:numberInstances) {
-
-  # i = 2
-  #  funcEvals = 7
-  #  seed=1
-  #  repls=2
-  #  ncpus= NA
+  # define the black box function according to the task
   model = mlr::train(mlr::makeLearner(task$simulation), mlr::makeRegrTask(data = task$data, target = task$target))
 
+  # get some infos
   info = getModelInfo(model, task$psOpt, minimize = task$minimize)
 
+  # run the benchmark
   resMBO = benchmarkMbo(list(model), task$psOpt, funcEvals, paramsMBO, minimize = task$minimize,
                         repls, ncpus, seed, delReg = TRUE)
 
-  #####################
+  ##################### apply data transformations, to get right data structure for further analysis (boxplotCurve(), testAddIters(), testConfigs())
   optimizationPath = as.list(NA)
   results = as.list(NA)
   targetColumn = info$featureNumber+1
   numberBoxplotCurve = length(namesBoxplot)
 
-  # i=1
   for (i in 1:(repls*numberBoxplotCurve)) {
     optimizationPath[[i]] = as.data.frame(resMBO[[i]][["optimizationPathMBO"]]$opt.path)
     # compute the best y found so far. iteration 0 = initial data
@@ -203,10 +279,6 @@ generateConfigdata = function(task, funcEvals = NULL, paramsMBO = NULL,
   y.name = info$y.name
   colnames(resultsPlotable)[colnames(resultsPlotable) == 'X1'] = y.name
 
-  #configDataFrame[[r]] = resultsPlotable
-
-
-  #configDataFrame = bind_rows(configDataFrame)
 
   return(resultsPlotable)
 }

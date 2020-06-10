@@ -1,6 +1,6 @@
 optimizeES = function(configuration, objSPOTFunc, info, funcEvals) {
 
-
+  # compute ES and define Hyperparameters
   res = configESFunc(instance = list(objSPOTFunc, info),
                      funcEvals = funcEvals,
                      #define Hyperparameters of ES Algrotihm

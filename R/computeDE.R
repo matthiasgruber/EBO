@@ -1,10 +1,12 @@
 computeDE = function(reg, objEncoded, configDE, repls) {
-  addAlgorithm(name = "SpotDE", fun = configDEFunc, reg = reg)
+  addAlgorithm(name = "de", fun = configDEFunc, reg = reg)
   # add Experiments to registry
   addExperiments(prob.designs = objEncoded, algo.designs = configDE, repls = repls, reg = reg)
 }
 
-configDEFunc = function(instance, funcEvals = 50, populationSize = NULL, ...) {
+configDEFunc = function(instance, funcEvals = 50, populationSize = NA, ...) {
+
+  # wrapper in order to use SPOT optimization algorithms
 
   fun2 = function(xmat) {
     apply(xmat, 1, instance[[1]])
@@ -22,9 +24,9 @@ configDEFunc = function(instance, funcEvals = 50, populationSize = NULL, ...) {
   y = as.data.frame(res[["ybest"]])
   x = as.data.frame(res[["xbest"]])
 
-  for (i in 1:instance[[2]]$featureNumber) {
+  # data transformations in the case of discrete variables
 
-    #if (instance[[2]]$featureType[i] == "integer") x[i] = as.integer(round(x[i]))
+  for (i in 1:instance[[2]]$featureNumber) {
 
     if (instance[[2]]$featureType[i] == "discrete") {
       x[i] = round(x[i])

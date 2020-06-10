@@ -20,6 +20,8 @@ cmaesrFunc = function(instance, funcEvals = 50, sigma = 0.5, lambda = NULL, mu =
   y = as.data.frame(optimizationPath[["best.fitness"]])
   x = as.data.frame(t(optimizationPath[["best.param"]]))
 
+  # data transformations in the case of discrete variables
+
   for (i in 1:instance[[2]]$featureNumber) {
 
     if (instance[[2]]$featureType[i] == "integer") x[i] = as.integer(round(x[i]))
