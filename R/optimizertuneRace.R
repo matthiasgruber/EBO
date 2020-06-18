@@ -231,7 +231,7 @@ optimizertuneRace = function(optimizer,
   # assertion on psTune
   if (optimizer == "optimizeMBO") {assertPsTune(psTune)}
 
-  if (optimizer == "optimizeES") {assertPsTuneES(psTune)}
+  if (optimizer == "optimizeES") {assertPsTuneES(psTuneES)}
 
   if (optimizer == "optimizeGenoud"| optimizer == "optimizeDE") {
     checkmate::assertChoice(names(psTune$pars), c("populationSize"))
