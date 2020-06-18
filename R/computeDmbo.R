@@ -35,7 +35,7 @@ computeDmbo = function(surrogateModel, minFuncEvals, funcEvals, psTune, itersMbo
 
     if (step == steps) minFuncEvals = funcEvals
 
-    listControlLearner = EBO::createMboControlSurrogate(hyperparamsDmbo[[step]])
+    listControlLearner = createMboControlSurrogate(hyperparamsDmbo[[step]])
 
     paramsDmboHyperparams = data.table::data.table(design = design,
                                                    amountDesign = list(NULL),
@@ -43,7 +43,7 @@ computeDmbo = function(surrogateModel, minFuncEvals, funcEvals, psTune, itersMbo
                                                    surrogate = list(listControlLearner[[2]])
     )
 
-    resComputeDmbo = EBO::benchmarkDmbo(list(surrogateModel), psOpt, minFuncEvals, paramsDmboHyperparams, minimize,
+    resComputeDmbo = benchmarkDmbo(list(surrogateModel), psOpt, minFuncEvals, paramsDmboHyperparams, minimize,
                                         repls, ncpus, seed, delReg = TRUE, step, replsOrg)
 
     evals = nrow(resComputeDmbo[[1]][["optimizationPathMBO"]][["opt.path"]][["env"]][["path"]])

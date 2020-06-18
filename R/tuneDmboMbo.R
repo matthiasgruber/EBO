@@ -18,7 +18,7 @@ tuneDmboMbo = function(surrogateModel, minFuncEvals, funcEvals, psTune, itersMbo
 
   if (step == 1) minFuncEvals = minFuncEvals + info$featureNumber + 1
 
-  stepOne = EBO::benchmarkMbo(list(surrogateModel), psOpt, minFuncEvals, paramsMBO = data.table::data.table(NULL),
+  stepOne = benchmarkMbo(list(surrogateModel), psOpt, minFuncEvals, paramsMBO = data.table::data.table(NULL),
                          minimize = minimize, repls = 1, ncpus = ncpus, seed = seed, delReg = TRUE)
 
   design = as.data.frame(stepOne[[1]][["optimizationPathMBO"]][["opt.path"]][["env"]][["path"]])
@@ -38,7 +38,7 @@ tuneDmboMbo = function(surrogateModel, minFuncEvals, funcEvals, psTune, itersMbo
 
     if(step > 2) designOpt = list(resTuneDmbo[[step-2]][[2]])
 
-    bestHyperparams = EBO::tuneMboMbo(surrogateModelTune, psOpt, minFuncEvals, psTune, itersMboTune = itersMboTune,
+    bestHyperparams = tuneMboMbo(surrogateModelTune, psOpt, minFuncEvals, psTune, itersMboTune = itersMboTune,
                                  minimize = minimize, repls = repls, ncpus = ncpus, seed = seed,
                                  designOpt = designOpt, maxTime = NULL)
 
@@ -46,7 +46,7 @@ tuneDmboMbo = function(surrogateModel, minFuncEvals, funcEvals, psTune, itersMbo
 
     if (step == steps) minFuncEvals = funcEvals
 
-    listControlLearner = EBO::createMboControlSurrogate(bestHyperparams)
+    listControlLearner = createMboControlSurrogate(bestHyperparams)
 
     paramsMBO = data.table::data.table(design = list(design),
                                        amountDesign = list(NULL),
@@ -54,7 +54,7 @@ tuneDmboMbo = function(surrogateModel, minFuncEvals, funcEvals, psTune, itersMbo
                                        surrogate = list(listControlLearner[[2]])
     )
 
-    resComputeDmbo = EBO::benchmarkMbo(list(surrogateModel), psOpt, minFuncEvals, paramsMBO = paramsMBO,
+    resComputeDmbo = benchmarkMbo(list(surrogateModel), psOpt, minFuncEvals, paramsMBO = paramsMBO,
                                   minimize = minimize, repls = 1, ncpus = ncpus, seed = seed, delReg = TRUE)
 
     evals = nrow(resComputeDmbo[[1]][["optimizationPathMBO"]][["opt.path"]][["env"]][["path"]])

@@ -2,27 +2,27 @@
 benchmarkDmbo = function(instances, psOpt, funcEvals, paramsMbo, minimize = TRUE,
                          repls = 10, ncpus = NA, seed = 1, delReg = TRUE, step, replsOrg) {
   # get instance info
-  info = EBO::getModelInfo(instances[[1]], psOpt, minimize)
+  info = getModelInfo(instances[[1]], psOpt, minimize)
   # get number of instances
   numberInstances = length(instances)
   # in first step do
   if (step == 1) {
     # create the configuration for mlrMBO algorithm
-    configMbo = EBO::createConfigMbo(funcEvals, paramsMbo)
+    configMbo = createConfigMbo(funcEvals, paramsMbo)
     # create batchtool instance
-    objNormal = EBO::createObjDesignNormal(instances, psOpt, info)
+    objNormal = createObjDesignNormal(instances, psOpt, info)
   }
   # in step greather then one do
   if (step > 1) {
     # split instances and create batchtool instance
     objNormal = list()
     for (i in 1:numberInstances) {
-      objNormal[[i]] = EBO::createObjDesignNormal(list(instances[[i]]), psOpt, info)
+      objNormal[[i]] = createObjDesignNormal(list(instances[[i]]), psOpt, info)
     }
     # create the initial design configuration for mlrMBO algorithm
     configMbo = list()
     for (i in 1:numberInstances) {
-      configMbo[[i]] = EBO::createConfigMbo(funcEvals, paramsMbo[c((replsOrg * (i-1) + 1) : (replsOrg * i)),])
+      configMbo[[i]] = createConfigMbo(funcEvals, paramsMbo[c((replsOrg * (i-1) + 1) : (replsOrg * i)),])
     }
   }
   # create registry
@@ -43,9 +43,9 @@ benchmarkDmbo = function(instances, psOpt, funcEvals, paramsMbo, minimize = TRUE
     }
   }
   # execute computation
-  EBO::executeComputation(reg, ncpus)
+  executeComputation(reg, ncpus)
   # reduce results
-  resDmbo = EBO::reduceMbo()
+  resDmbo = reduceMbo()
   # delete registry
   if (delReg) batchtools::removeRegistry(0, reg)
   # return result of Benchmark

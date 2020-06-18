@@ -3,11 +3,11 @@ tuneDmboMboCompute = function(instancesTrain, psOpt, funcEvals, psTune, itersMbo
                               designOpt = NULL, step, replsOrg) {
 
     set.seed(seed)
-    info = EBO::getModelInfo(instancesTrain[[1]], psOpt, minimize)
+    info = getModelInfo(instancesTrain[[1]], psOpt, minimize)
 
     getMedianBenchmarkMbo = function(x) {
 
-      listControlLearner = EBO::createMboControlSurrogate(x)
+      listControlLearner = createMboControlSurrogate(x)
 
       if (is.null(designOpt)) designOpt = x$design
 
@@ -17,7 +17,7 @@ tuneDmboMboCompute = function(instancesTrain, psOpt, funcEvals, psTune, itersMbo
                              surrogate = list(listControlLearner[[2]])
       )
 
-      resMboBenchmark = EBO::benchmarkDmbo(instancesTrain, psOpt, funcEvals, paramsMbo,
+      resMboBenchmark = benchmarkDmbo(instancesTrain, psOpt, funcEvals, paramsMbo,
                                       minimize, repls, ncpus, seed, delReg = TRUE, step, replsOrg)
 
       results = NA

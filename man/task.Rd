@@ -23,9 +23,6 @@ Collection of parameters and their constraints for problem optimization}
 \item{minimize}{[\code{logical(1)}]\cr
 Should the target be minimized? \cr
 Default is `TRUE`.}
-
-\item{task}{[\code{EBO:: task()}]\cr
-Task defines the problem setting.}
 }
 \value{
 List with relevant informations of a specific problem.
@@ -34,4 +31,39 @@ List with relevant informations of a specific problem.
 This functions enables users to create a task, which mainly describes the optimization problem.
 Task is required for many EBO functions, such as EBO::optimizertuneRace(), EBO::generateConfigdata()
 or EBO::generateProblemList().
+}
+\examples{
+\dontrun{
+set.seed(1)
+
+library(mlrMBO)
+library(ParamHelpers)
+library(mlr)
+
+set.seed(1)
+
+# define problem / task
+data <- data.frame(a = runif(50,10,5555), b = runif(50,-30000,-500),
+                   c = runif(50,0,1000))
+data$ratio <- rowSums(data[,1:3]^2)
+data$ratio <- data$ratio/max(data$ratio)
+colnames(data) <- c("power", "time", "pressure","ratio")
+
+psOpt = makeParamSet(
+
+ makeIntegerParam("power", lower = 10, upper = 5555),
+
+ makeIntegerParam("time", lower = -30000, upper = -500),
+
+ makeIntegerParam("pressure", lower = 0, upper = 1000)
+)
+
+task = task(
+ simulation = "regr.randomForest",
+ data = data,
+ target = "ratio",
+ psOpt = psOpt,
+ minimize = FALSE
+)
+}
 }

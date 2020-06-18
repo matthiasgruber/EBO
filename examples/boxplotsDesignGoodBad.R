@@ -1,8 +1,3 @@
-library(ParamHelpers)
-library(readr)
-
-set.seed(1)
-
 
 # define infillCrit
 ctrl = mlrMBO::makeMBOControl()
@@ -10,7 +5,8 @@ ctrl = mlrMBO::setMBOControlInfill(ctrl, crit = mlrMBO::makeMBOInfillCritEI())
 
 # define MBO configuration
 paramsMBO = data.table::data.table(
-  design = list(c(0.8,1), c(0,0.2)),
+  design = list(c(0.8,1),
+                c(0,0.2)),
   amountDesign = list(12),
   control = list(ctrl),
   surrogate = list(mlr::makeLearner("regr.randomForest", predict.type = "se"))
@@ -55,13 +51,10 @@ boxplotCurve(synthGB_ConfigResults)
 #### kapton problem ###
 kapton = as.data.frame(readxl::read_excel("examples/data/kaptonArgon.xlsx"))
 
-psOpt = makeParamSet(
-
-  makeIntegerParam("power", lower = 10, upper = 5555),
-
-  makeIntegerParam("time", lower = 500, upper = 20210),
-
-  makeIntegerParam("pressure", lower = 0, upper = 1000)
+psOpt = ParamHelpers::makeParamSet(
+  ParamHelpers::makeIntegerParam("power", lower = 10, upper = 5555),
+  ParamHelpers::makeIntegerParam("time", lower = 500, upper = 20210),
+  ParamHelpers::makeIntegerParam("pressure", lower = 0, upper = 1000)
 )
 
 task_Kapton = task(
@@ -76,5 +69,4 @@ task_Kapton = task(
 kaptGBConfigResults = generateConfigdata(task_Kapton, funcEvals = funcEvals, paramsMBO,
                                        namesBoxplot = namesBoxplot, repls = repls)
 # boxplot curve of configs
-
 boxplotCurve(kaptGBConfigResults)

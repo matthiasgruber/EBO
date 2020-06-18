@@ -19,7 +19,7 @@ optimizeES = function(configuration, objSPOTFunc, info, funcEvals) {
                      stratReco = ifelse(!is.null(configuration$stratReco), stratReco <- configuration$stratReco, stratReco <- 2),
 
                      objReco = ifelse(!is.null(configuration$objReco), objReco <- configuration$objReco, objReco <- 2)
-)
+                     )
 
   return(res)
 }

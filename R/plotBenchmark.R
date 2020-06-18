@@ -62,8 +62,8 @@ plotBenchmark = function(task, funcEvals = 65, paramsMBO = data.table::data.tabl
                          paramsDE = data.table::data.table(NULL), paramsGE = data.table::data.table(NULL),
                          repls = 25, showInfo = TRUE, ncpus = NA, seed = 5) {
 
-  EBO::assertTask(task)
-  EBO::assertReplsNcpusSeed(repls, ncpus, seed)
+  assertTask(task)
+  assertReplsNcpusSeed(repls, ncpus, seed)
   checkmate::assertLogical(showInfo, len = 1, any.missing = FALSE)
   checkmate::assertIntegerish(funcEvals, lower = 56, any.missing = TRUE,
                               len = 1)
@@ -82,15 +82,15 @@ plotBenchmark = function(task, funcEvals = 65, paramsMBO = data.table::data.tabl
                         mlr::makeRegrTask(data = task$data, target = task$target))
 
   # get information of the optimization problem
-  info = EBO::getModelInfo(instance, task$psOpt, task$minimize)
+  info = getModelInfo(instance, task$psOpt, task$minimize)
 
   # create registry
   reg = batchtools::makeExperimentRegistry(file.dir = NA, seed = seed)
 
   # create designs for objective function
-  objEncoded = EBO::createObjDesignEncoded(list(instance), task$psOpt, info)
-  objEncodedSpot = EBO::createObjDesignEncodedSpot(list(instance), task$psOpt, info)
-  objNormal = EBO::createObjDesignNormal(list(instance), task$psOpt, info)
+  objEncoded = createObjDesignEncoded(list(instance), task$psOpt, info)
+  objEncodedSpot = createObjDesignEncodedSpot(list(instance), task$psOpt, info)
+  objNormal = createObjDesignNormal(list(instance), task$psOpt, info)
 
   # add the numeric encoded objective function to the registry
   batchtools::addProblem(name = "objEncoded", fun = objEncodedFunc, reg = reg)
@@ -100,30 +100,30 @@ plotBenchmark = function(task, funcEvals = 65, paramsMBO = data.table::data.tabl
   batchtools::addProblem(name = "objNormal", fun = objNormalFunc, reg = reg)
 
   # create configurations for optimization algos
-  configCmaesr = EBO::createConfigCmaesr(funcEvals, paramsCMAESR)
-  configMbo = EBO::createConfigMbo(funcEvals, paramsMBO)
-  configRandom = EBO::createConfigRandom(funcEvals)
-  configRacing = EBO::createConfigRacing(funcEvals)
-  configEs = EBO::createConfigEs(funcEvals, paramsES)
-  configDe = EBO::createConfigDe(funcEvals, paramsDE)
-  configGe = EBO::createConfigGe(funcEvals, paramsGE)
+  configCmaesr = createConfigCmaesr(funcEvals, paramsCMAESR)
+  configMbo = createConfigMbo(funcEvals, paramsMBO)
+  configRandom = createConfigRandom(funcEvals)
+  configRacing = createConfigRacing(funcEvals)
+  configEs = createConfigEs(funcEvals, paramsES)
+  configDe = createConfigDe(funcEvals, paramsDE)
+  configGe = createConfigGe(funcEvals, paramsGE)
 
   # add optimization algos to registry
-  EBO::computeRandom(reg, objNormal, configRandom, repls)
-  EBO::computeMBO(reg, objNormal, configMbo, info, repls)
-  EBO::computeRacing(reg, objNormal, configRacing, repls)
-  EBO::computeCMAESR(reg, objEncoded, configCmaesr, repls)
-  EBO::computeEs(reg, objEncodedSpot, configEs, repls)
-  EBO::computeDE(reg, objEncodedSpot, configDe, repls)
-  EBO::computeGE(reg, objEncodedSpot, configGe, repls)
+  computeRandom(reg, objNormal, configRandom, repls)
+  computeMBO(reg, objNormal, configMbo, info, repls)
+  computeRacing(reg, objNormal, configRacing, repls)
+  computeCMAESR(reg, objEncoded, configCmaesr, repls)
+  computeEs(reg, objEncodedSpot, configEs, repls)
+  computeDE(reg, objEncodedSpot, configDe, repls)
+  computeGE(reg, objEncodedSpot, configGe, repls)
 
   # execute computation
-  EBO::executeComputation(reg, ncpus)
+  executeComputation(reg, ncpus)
 
   # reduce results
-  resultsRandom = EBO::reduceRandom(ids = seq(from = 1, to = repls))
-  resultsMbo = EBO::reduceMbo(ids = seq(from = (repls + 1), to = (repls*2)))
-  resultsRacing = EBO::reduceRacing(ids = seq(from = ((repls*2)+1),
+  resultsRandom = reduceRandom(ids = seq(from = 1, to = repls))
+  resultsMbo = reduceMbo(ids = seq(from = (repls + 1), to = (repls*2)))
+  resultsRacing = reduceRacing(ids = seq(from = ((repls*2)+1),
                                               to = (repls*3)))
   resultCmeasr = batchtools::reduceResultsList(ids = seq(from = (repls*3)+1,
                                                          to = (repls*4)), fun = reduceOptimize)
@@ -199,7 +199,7 @@ plotBenchmark = function(task, funcEvals = 65, paramsMBO = data.table::data.tabl
     ylab(info$y.name)
   # add info to plot
   if (showInfo == TRUE) {
-    plot = EBO::addInfo(plot, info, timeTaken, repls)
+    plot = addInfo(plot, info, timeTaken, repls)
   }
 
   return(plot)

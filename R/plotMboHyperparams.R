@@ -69,8 +69,8 @@
 plotMboHyperparams = function(task, funcEvals, psParamPlot, resolution,
                               repls, showInfo = TRUE, ncpus = NA, seed = 1) {
 
-  EBO::assertTask(task)
-  EBO::assertReplsNcpusSeed(repls, ncpus, seed)
+  assertTask(task)
+  assertReplsNcpusSeed(repls, ncpus, seed)
   checkmate::assertLogical(showInfo, len = 1, any.missing = FALSE)
   checkmate::assertIntegerish(funcEvals, lower = 1, any.missing = TRUE,
                               len = 1)
@@ -87,10 +87,10 @@ plotMboHyperparams = function(task, funcEvals, psParamPlot, resolution,
   instancesTest = mlr::train(mlr::makeLearner(task$simulation),
                              mlr::makeRegrTask(data = task$data, target = task$target))
 
-  info = EBO::getModelInfo(instancesTest, task$psOpt, task$minimize)
+  info = getModelInfo(instancesTest, task$psOpt, task$minimize)
 
   designMbo = ParamHelpers::generateGridDesign(par.set = psParamPlot, resolution = resolution)
-  resDesignMbo = EBO::computeDesignMbo(info, list(instancesTest), task$psOpt, designMbo, psParamPlot, funcEvals, task$minimize, repls, ncpus, seed)
+  resDesignMbo = computeDesignMbo(info, list(instancesTest), task$psOpt, designMbo, psParamPlot, funcEvals, task$minimize, repls, ncpus, seed)
 
   delete = NA
   for (i in 1:length(psParamPlot[["pars"]])) {

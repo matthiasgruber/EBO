@@ -16,13 +16,12 @@
 #' @param minimize [\code{logical(1)}]\cr
 #'  Should the target be minimized? \cr
 #'  Default is `TRUE`.
-#' @param task [\code{EBO:: task()}]\cr
-#'  Task defines the problem setting.
 #'
 #' @return List with relevant informations of a specific problem.
+#'
 #' @export
 #'
-#'  @examples
+#' @examples
 #' \dontrun{
 #' set.seed(1)
 #'

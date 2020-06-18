@@ -98,7 +98,7 @@ tuneMboMbo = function(instance, psOpt, funcEvals, psTune, itersMboTune = 10,
   for (i in 1:length(instance)) {
     checkmate::assertClass(instance[[1]], classes = "WrappedModel", null.ok = FALSE)
   }
-  EBO::assertReplsNcpusSeed(repls, ncpus, seed)
+  assertReplsNcpusSeed(repls, ncpus, seed)
   checkmate::assertLogical(minimize, len = 1, any.missing = FALSE)
   checkmate::assertIntegerish(maxTime, lower = 1, any.missing = TRUE,
                               len = 1, null.ok = TRUE)
@@ -108,16 +108,16 @@ tuneMboMbo = function(instance, psOpt, funcEvals, psTune, itersMboTune = 10,
   checkmate::assertClass(designOpt, classes = c("data.frame"))
   checkmate::assertIntegerish(funcEvals, lower = 1, any.missing = TRUE,
                               len = 1)
-  EBO::assertPsTune(psTune)
+  assertPsTune(psTune)
 
   # start of function
   set.seed(seed)
-  info = EBO::getModelInfo(instance[[1]], psOpt, minimize)
+  info = getModelInfo(instance[[1]], psOpt, minimize)
 
   # benchmark mlrMBO configuration
   getMedianBenchmarkMbo = function(x) {
     # convert character string to mlrMBO objects
-    listControlLearner = EBO::createMboControlSurrogate(x)
+    listControlLearner = createMboControlSurrogate(x)
 
     if (is.null(designOpt)) designOpt = x$design
 
@@ -127,7 +127,7 @@ tuneMboMbo = function(instance, psOpt, funcEvals, psTune, itersMboTune = 10,
                            surrogate = list(listControlLearner[[2]])
     )
     # benchmark mlrMBO configuration
-    resMboBenchmark = EBO::benchmarkMbo(instance, psOpt, funcEvals, paramsMBO, minimize, repls, ncpus, seed)
+    resMboBenchmark = benchmarkMbo(instance, psOpt, funcEvals, paramsMBO, minimize, repls, ncpus, seed)
     # get results
     results = NA
     for (i in 1:length(resMboBenchmark)) {

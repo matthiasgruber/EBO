@@ -229,9 +229,9 @@ optimizertuneRace = function(optimizer,
   #itersTune assertions works within the iRace package
 
   # assertion on psTune
-  if (optimizer == "optimizeMBO") {EBO::assertPsTune(psTune)}
+  if (optimizer == "optimizeMBO") {assertPsTune(psTune)}
 
-  if (optimizer == "optimizeES") {EBO::assertPsTuneES(psTune)}
+  if (optimizer == "optimizeES") {assertPsTuneES(psTune)}
 
   if (optimizer == "optimizeGenoud"| optimizer == "optimizeDE") {
     checkmate::assertChoice(names(psTune$pars), c("populationSize"))

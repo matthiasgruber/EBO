@@ -118,7 +118,7 @@ plotAutoMbo = function(resMboDefault, resDmboTuned, minFuncEvals, funcEvals, rep
   timeTaken <- round(endTime - startTime,2)
 
   if (showInfo == TRUE) {
-    boxplotCurve = EBO::addInfo(boxplotCurve, info, timeTaken, repls)
+    boxplotCurve = addInfo(boxplotCurve, info, timeTaken, repls)
   }
 
   return(boxplotCurve)

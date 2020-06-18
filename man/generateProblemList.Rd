@@ -7,29 +7,8 @@
 generateProblemList(...)
 }
 \arguments{
-\item{psOpt}{[\code{ParamHelpers::ParamSet()}]\cr
-Collection of parameters and their constraints for problem optimization}
-
-\item{simulation}{[\code{character}]\cr
-The black box function e.g. model for the \code{mlrMBO}
-Default is `regr.randomForest`.}
-
-\item{minimize}{[\code{logical(1)}]\cr
-Should the target be minimized? \cr
-Default is `TRUE`.}
-
-\item{data}{[\code{data.frame}]\cr
-Data of problem. \cr}
-
-\item{target}{[\code{character}]\cr
-The variable, which one wants to minimize (maximize) \code{mlrMBO}.}
-
-\item{task}{[\code{EBO:: task()}]\cr
+\item{...}{[\code{EBO:: task()}]\cr
 Task defines the problem setting.}
-
-\item{generateProblemList}{[\code{EBO::generateProblemList()}]\cr
-Define list with instances e.g. tasks, which are used for tuning. Several tasks can be passed
-to EBO::generateProblemList().\cr}
 }
 \value{
 List of instances with different problems / tasks.

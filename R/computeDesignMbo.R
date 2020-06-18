@@ -52,11 +52,8 @@ computeDesignMbo = function(info, instancesTest, psOpt, designMbo, psParamPlot, 
   }
 
   for (i in 1:nrow(designMbo)) {
-    resDesignTune$y[i] = median(c(designMboExtended$y[(repls*(i-1)+1):(repls*i)])#,
-                                  #designMboExtended$y[(repls*(i-1)+1+repls*4*1):(repls*i+repls*4*1)],
-                                  #designMboExtended$y[(repls*(i-1)+1+repls*4*2):(repls*i+repls*4*2)],
-                                  #designMboExtended$y[(repls*(i-1)+1+repls*4*3):(repls*i+repls*4*3)])
-                                  , na.rm = TRUE)
+    resDesignTune$y[i] = median(c(designMboExtended$y[(repls*(i-1)+1):(repls*i)])
+                                  ,na.rm = TRUE)
   }
 
   return(resDesignTune)

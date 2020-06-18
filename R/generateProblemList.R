@@ -3,25 +3,12 @@
 #' This functions enables users to create an instance list with different problems, which are
 #' used for EBO::optimizertuneRace().
 #'
-#' @param psOpt [\code{ParamHelpers::ParamSet()}]\cr
-#'  Collection of parameters and their constraints for problem optimization
-#' @param simulation [\code{character}]\cr
-#'  The black box function e.g. model for the \code{mlrMBO}
-#'  Default is `regr.randomForest`.
-#' @param minimize [\code{logical(1)}]\cr
-#'  Should the target be minimized? \cr
-#'  Default is `TRUE`.
-#' @param data [\code{data.frame}]\cr
-#'  Data of problem. \cr
-#' @param target [\code{character}]\cr
-#'  The variable, which one wants to minimize (maximize) \code{mlrMBO}.
-#' @param task [\code{EBO:: task()}]\cr
+#' @param ... [\code{EBO:: task()}]\cr
 #'  Task defines the problem setting.
-#' @param generateProblemList [\code{EBO::generateProblemList()}]\cr
-#'  Define list with instances e.g. tasks, which are used for tuning. Several tasks can be passed
-#'  to EBO::generateProblemList().\cr
 #'
 #' @return List of instances with different problems / tasks.
+#'
+#' @export
 #'
 #' @examples
 #' \dontrun{

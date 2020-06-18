@@ -1,18 +1,10 @@
-library(ParamHelpers)
-library(readr)
-
-set.seed(1)
-
 # define problem 1
 graphene <- as.data.frame(readxl::read_excel("examples/data/grapheneArgon.xlsx"))
 
-psOpt = makeParamSet(
-
-  makeIntegerParam("power", lower = 10, upper = 5555),
-
-  makeIntegerParam("time", lower = 500, upper = 20210),
-
-  makeIntegerParam("pressure", lower = 0, upper = 100)
+psOpt = ParamHelpers::makeParamSet(
+  ParamHelpers::makeIntegerParam("power", lower = 10, upper = 5555),
+  ParamHelpers::makeIntegerParam("time", lower = 500, upper = 20210),
+  ParamHelpers::makeIntegerParam("pressure", lower = 0, upper = 100)
 )
 
 task_Graphene = task(
@@ -24,15 +16,12 @@ task_Graphene = task(
 )
 
 # define problem 2
-kapton <- as.data.frame(readxl::read_excel("examples/data/kapton_argon.xlsx"))
+kapton <- as.data.frame(readxl::read_excel("examples/data/kaptonArgon.xlsx"))
 
-psOpt = makeParamSet(
-
-  makeIntegerParam("power", lower = 10, upper = 5555),
-
-  makeIntegerParam("time", lower = 500, upper = 20210),
-
-  makeIntegerParam("pressure", lower = 0, upper = 1000)
+psOpt = ParamHelpers::makeParamSet(
+  ParamHelpers::makeIntegerParam("power", lower = 10, upper = 5555),
+  ParamHelpers::makeIntegerParam("time", lower = 500, upper = 20210),
+  ParamHelpers::makeIntegerParam("pressure", lower = 0, upper = 1000)
 )
 
 task_Kapton = task(
@@ -43,12 +32,9 @@ task_Kapton = task(
   minimize = FALSE
 )
 
-
-taskList = list(task_Graphene, task_Kapton)
-
 ################## Define problemList #############
 
-problemList = generateProblemList(taskList)
+problemList = generateProblemList(task_Graphene, task_Kapton)
 
 
 
@@ -59,28 +45,29 @@ psTune = ParamHelpers::makeParamSet(
   ParamHelpers::makeDiscreteParam("design", values = c("maximinLHS",
                                                        "optimumLHS")),
 
-  ParamHelpers::makeDiscreteParam("surrogate", values = c("regr.km")),
+  ParamHelpers::makeDiscreteParam("crit", values = c("makeMBOInfillCritEI",
+                                                     "makeMBOInfillCritAEI",
+                                                     "makeMBOInfillCritCB",
+                                                     "makeMBOInfillCritAdaCB")),
 
-  ParamHelpers::makeDiscreteParam("covtype", values = c("matern5_2","matern3_2", "powexp", "gauss")),
-
-  ParamHelpers::makeDiscreteParam("crit", values = c("makeMBOInfillCritCB", "makeMBOInfillCritAdaCB","makeMBOInfillCritEI")),
-
-  ParamHelpers::makeNumericParam("cb.lambda", lower = 0.7, upper = 1.3,
+  ParamHelpers::makeIntegerParam("cb.lambda", lower = 1, upper = 5,
                                  requires = quote(crit == "makeMBOInfillCritCB")),
 
-  ParamHelpers::makeIntegerParam("cb.lambda.start", lower = 2, upper = 200,
+  ParamHelpers::makeIntegerParam("cb.lambda.start", lower = 3, upper = 10,
                                  requires = quote(crit == "makeMBOInfillCritAdaCB")),
 
-  ParamHelpers::makeNumericParam("cb.lambda.end", lower = 0.001, upper = 1,
-                                 requires = quote(crit == "makeMBOInfillCritAdaCB"))
+  ParamHelpers::makeNumericParam("cb.lambda.end", lower = 0, upper = 3,
+                                 requires = quote(crit == "makeMBOInfillCritAdaCB")),
+
+  ParamHelpers::makeDiscreteParam("surrogate", values = c("regr.randomForest", "regr.km")),
+
+  ParamHelpers::makeDiscreteParam("covtype" ,values = c("gauss","matern5_2",
+                                                        "matern3_2","powexp"),
+                                  requires = quote(surrogate == "regr.km"))
 )
 
-
-
+# execute tuning
 tuneResults3 = optimizertuneRace("optimizeMBO", psTune,
                                 funcEvals = 55, itersTune = 1000, trainInstanceList = problemList,
                                 minimize = FALSE, configurationsFile = "examples/configurations.txt",
                                 plotAblation = TRUE, ablationFile = "ablationMBOPlot3.pdf", seed = 1)
-
-
-

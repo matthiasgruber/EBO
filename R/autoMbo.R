@@ -64,7 +64,7 @@ autoMbo = function(data, target, minimize = FALSE, funcEvals,
   data = as.data.frame(data)
   checkmate::assertClass(data, classes = c("data.frame"))
   checkmate::assertClass(target, classes = c("character"))
-  EBO::assertReplsNcpusSeed(repls, ncpus, seed)
+  assertReplsNcpusSeed(repls, ncpus, seed)
   checkmate::assertLogical(minimize, len = 1, any.missing = FALSE)
   checkmate::assertLogical(showInfo, len = 1, any.missing = FALSE)
   checkmate::assertIntegerish(itersMboTune, lower = 1, any.missing = TRUE,
@@ -80,12 +80,12 @@ autoMbo = function(data, target, minimize = FALSE, funcEvals,
   data = as.data.frame(data)
 
   # get parameter space
-  psOpt = EBO::generateParamSpace(data, target)
+  psOpt = generateParamSpace(data, target)
   # train surrogate model of the black-box function
   surrogateModel = mlr::train(mlr::makeLearner("regr.randomForest", nodesize = 5),
                               mlr::makeRegrTask(data = data, target = target))
   # get info of the optimization problem
-  info = EBO::getModelInfo(surrogateModel, psOpt, minimize)
+  info = getModelInfo(surrogateModel, psOpt, minimize)
 
   # psTune
   if (any(info$featureType == "factor")) {
@@ -125,8 +125,8 @@ autoMbo = function(data, target, minimize = FALSE, funcEvals,
   steps = as.integer(ceiling((funcEvals - info$featureNumber - 1) / minFuncEvals))
 
   # execute DMBO tuning
-  resTuneDmbo = EBO::tuneDmboMbo(surrogateModel, minFuncEvals, funcEvals, psTune, itersMboTune,
-                                 minimize, repls, ncpus, seed, psOpt, info, steps)
+  resTuneDmbo = tuneDmboMbo(surrogateModel, minFuncEvals, funcEvals, psTune, itersMboTune,
+                            minimize, repls, ncpus, seed, psOpt, info, steps)
 
   # double the amount of replications for the benchmarks
   repls = repls*2
@@ -138,8 +138,8 @@ autoMbo = function(data, target, minimize = FALSE, funcEvals,
                                             surrogate = list(NULL)
   )
 
-  resMboDefault = EBO::benchmarkMbo(list(surrogateModel), psOpt, funcEvals, paramsSmboDefault,
-                                    minimize, repls, ncpus, seed)
+  resMboDefault = benchmarkMbo(list(surrogateModel), psOpt, funcEvals, paramsSmboDefault,
+                               minimize, repls, ncpus, seed)
 
 
   # benchmark DMBO with the tuned hyperparameters
@@ -148,12 +148,12 @@ autoMbo = function(data, target, minimize = FALSE, funcEvals,
     hyperparamsDmbo[[i]] = resTuneDmbo[[i]][[1]]
   }
 
-  resDmboTuned = EBO::computeDmbo(surrogateModel, minFuncEvals, funcEvals, psTune, itersMboTune,
-                                  minimize, repls, ncpus, seed, psOpt, info, hyperparamsDmbo, steps)
+  resDmboTuned = computeDmbo(surrogateModel, minFuncEvals, funcEvals, psTune, itersMboTune,
+                             minimize, repls, ncpus, seed, psOpt, info, hyperparamsDmbo, steps)
 
   # plot DMBO vs. SMBO
-  plot = EBO::plotAutoMbo(resMboDefault, resDmboTuned, minFuncEvals, funcEvals, repls, showInfo, info,
-                          ncpus, seed, step, startTime, steps, hyperparamsDmbo)
+  plot = plotAutoMbo(resMboDefault, resDmboTuned, minFuncEvals, funcEvals, repls, showInfo, info,
+                     ncpus, seed, step, startTime, steps, hyperparamsDmbo)
 
   return(plot)
 }

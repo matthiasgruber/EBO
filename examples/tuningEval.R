@@ -1,10 +1,10 @@
 grapheneArgon = as.data.frame(readxl::read_excel("examples/data/grapheneArgon.xlsx"))
 
 # define parameter spce
-psOpt = makeParamSet(
-  makeIntegerParam("power", lower = 10, upper = 5555),
-  makeIntegerParam("time", lower = 500, upper = 20210),
-  makeIntegerParam("pressure", lower = 0, upper = 100)
+psOpt = ParamHelpers::makeParamSet(
+  ParamHelpers::makeIntegerParam("power", lower = 10, upper = 5555),
+  ParamHelpers::makeIntegerParam("time", lower = 500, upper = 20210),
+  ParamHelpers::makeIntegerParam("pressure", lower = 0, upper = 100)
 )
 
 # create task
@@ -38,11 +38,11 @@ namesBoxplot = c("mlrMBO default",
 funcEvals = 55
 
 # generate Data
-kaptConfigResults = EBO::generateConfigdata(task_grapheneArgon, funcEvals = funcEvals, paramsMBO,
+grapConfigResults = EBO::generateConfigdata(task_grapheneArgon, funcEvals = funcEvals, paramsMBO,
                                             namesBoxplot = namesBoxplot, repls = 20, seed = 1235)
 
 
-eval1 = EBO::boxplotCurve(kaptConfigResults)
+eval1 = EBO::boxplotCurve(grapConfigResults)
 
 
 
@@ -58,10 +58,10 @@ eval1 = EBO::boxplotCurve(kaptConfigResults)
 kapton = as.data.frame(readxl::read_excel("examples/data/kaptonArgon.xlsx"))
 
 # define parameter spce
-psOpt = makeParamSet(
-  makeIntegerParam("power", lower = 10, upper = 5555),
-  makeIntegerParam("time", lower = 500, upper = 20210),
-  makeIntegerParam("pressure", lower = 0, upper = 1000)
+psOpt = ParamHelpers::makeParamSet(
+  ParamHelpers::makeIntegerParam("power", lower = 10, upper = 5555),
+  ParamHelpers::makeIntegerParam("time", lower = 500, upper = 20210),
+  ParamHelpers::makeIntegerParam("pressure", lower = 0, upper = 1000)
 )
 
 # create task
@@ -79,7 +79,8 @@ ctrl = mlrMBO::setMBOControlInfill(ctrl, crit = mlrMBO::makeMBOInfillCritCB(3))
 
 # define MBO configuration
 paramsMBO = data.table::data.table(
-  design = list(NULL,"optimumLHS"),
+  design = list(NULL,
+                "optimumLHS"),
   amountDesign = list(4),
   control = list(NULL,
                  ctrl),
@@ -99,7 +100,7 @@ kaptConfigResults = EBO::generateConfigdata(task_Kapton, funcEvals = funcEvals, 
                                             namesBoxplot = namesBoxplot, repls = 20, seed = 1)
 
 
-eval1 = EBO::boxplotCurve(kaptConfigResults)
+eval2 = EBO::boxplotCurve(kaptConfigResults)
 
 
 
@@ -121,7 +122,7 @@ psOpt = ParamHelpers::makeParamSet(
 )
 
 # create task
-task_Kapton = EBO::task(
+task_synt = EBO::task(
   simulation = "regr.randomForest",
   data = synthesis,
   target = "interface",
@@ -151,8 +152,8 @@ namesBoxplot = c("mlrMBO default",
 funcEvals = 55
 
 # generate Data
-kaptConfigResults = EBO::generateConfigdata(task_Kapton, funcEvals = funcEvals, paramsMBO,
+syntConfigResults = EBO::generateConfigdata(task_synt, funcEvals = funcEvals, paramsMBO,
                                             namesBoxplot = namesBoxplot, repls = 20, seed = 1)
 
 
-eval1 = EBO::boxplotCurve(kaptConfigResults)
+eval3 = EBO::boxplotCurve(syntConfigResults)

@@ -1,14 +1,10 @@
-library(ParamHelpers)
-library(readr)
-
-
 # define problem 1
 kapton <- as.data.frame(readxl::read_excel("examples/data/kaptonArgon.xlsx"))
 
-psOpt = makeParamSet(
-  makeIntegerParam("power", lower = 10, upper = 5555),
-  makeIntegerParam("time", lower = 500, upper = 20210),
-  makeIntegerParam("pressure", lower = 0, upper = 1000)
+psOpt = ParamHelpers::makeParamSet(
+  ParamHelpers::makeIntegerParam("power", lower = 10, upper = 5555),
+  ParamHelpers::makeIntegerParam("time", lower = 500, upper = 20210),
+  ParamHelpers::makeIntegerParam("pressure", lower = 0, upper = 1000)
 )
 
 task_Kapton = task(
@@ -41,8 +37,6 @@ task_Synthesis = task(
 
 problemList = generateProblemList(task_Kapton, task_Synthesis)
 
-### 2.4 tuneMBO
-set.seed(1)
 
 psTune = ParamHelpers::makeParamSet(
 
@@ -70,6 +64,7 @@ psTune = ParamHelpers::makeParamSet(
                                   requires = quote(surrogate == "regr.km"))
 )
 
+# execute tuning
 tuneResults = optimizertuneRace("optimizeMBO", psTune,
                                 funcEvals = 55, itersTune = 1000, trainInstanceList = problemList,
                                 minimize = FALSE, configurationsFile = "examples/configurations.txt",
