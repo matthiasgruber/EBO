@@ -120,6 +120,10 @@ plotBenchmark = function(task, funcEvals = 65, paramsMBO = data.table::data.tabl
   # execute computation
   executeComputation(reg, ncpus)
 
+  # get error massages
+  errors = batchtools::getErrorMessages()
+  if (length(errors) > 0) return(errors)
+
   # reduce results
   resultsRandom = reduceRandom(ids = seq(from = 1, to = repls))
   resultsMbo = reduceMbo(ids = seq(from = (repls + 1), to = (repls*2)))

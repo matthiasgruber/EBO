@@ -56,6 +56,7 @@
 #' @import cmaesr
 #' @import irace
 #' @import smoof
+#' @import SPOT
 
 autoMbo = function(data, target, minimize = FALSE, funcEvals,
                    minFuncEvals = 10, itersMboTune = 10, repls = 10,
