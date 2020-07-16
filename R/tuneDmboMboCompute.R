@@ -46,7 +46,14 @@ tuneDmboMboCompute = function(instancesTrain, psOpt, funcEvals, psTune, itersMbo
 
     hyperparamsPath = as.data.frame(resMboTune[["opt.path"]][["env"]][["path"]])
 
-    bestHyperparams = hyperparamsPath[which.max(hyperparamsPath$y),]
+
+    if (minimize == FALSE) {
+      bestHyperparams = hyperparamsPath[which.max(hyperparamsPath$y),]
+    }
+
+    if (minimize == TRUE) {
+      bestHyperparams = hyperparamsPath[which.min(hyperparamsPath$y),]
+    }
 
     return(bestHyperparams)
   }
