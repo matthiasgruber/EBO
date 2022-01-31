@@ -10,6 +10,8 @@ test_that("Test if works for mixed ps + every argument in use + maximize", {
   data$ratio <- rowSums(data[,1:3]^2)
   data$ratio <- data$ratio/max(data$ratio)
   colnames(data) <- c("power", "time", "pressure", "gas", "cat","ratio")
+  data$gas = as.factor(data$gas)
+  data$cat = as.factor(data$cat)
   model = list(mlr::train(mlr::makeLearner("regr.randomForest"), mlr::makeRegrTask(data = data, target = "ratio")))
 
   psOpt = ParamHelpers::makeParamSet(

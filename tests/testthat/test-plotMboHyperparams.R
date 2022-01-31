@@ -9,6 +9,7 @@ test_that("Test if works for mixed ps + every argument in use + maximize + 2D", 
   data$ratio <- rowSums(data[,1:3]^2)
   data$ratio <- data$ratio/max(data$ratio)
   colnames(data) <- c("power", "time", "pressure", "gas","ratio")
+  data$gas = as.factor(data$gas)
   psOpt = ParamHelpers::makeParamSet(
     ParamHelpers::makeIntegerParam("power", lower = 10, upper = 5555),
     ParamHelpers::makeIntegerParam("time", lower = -30000, upper = -500),
