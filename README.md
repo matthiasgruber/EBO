@@ -1,6 +1,6 @@
 # EBO - a material science toolbox
 
-A R package desinged for material science. EBO is connected to the black-box function optimization R packages mlrMBO, SPOT, iRace and cmaesr. EBO has outstanding benchmark features, specifically for model-based optimization.
+An R package designed for material science. EBO is connected to the black-box function optimization R packages mlrMBO, SPOT, iRace, and cmaesr. EBO has outstanding benchmark features, specifically for model-based optimization.
 
 # Material-Science and Machine Learning
 
